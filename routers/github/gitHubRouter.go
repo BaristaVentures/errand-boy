@@ -29,7 +29,7 @@ func init() {
 	instance.routes = routers.Routes{
 		&routers.Route{
 			Path:     "/github/pr",
-			Method:   "GET",
+			Method:   "POST",
 			Handlers: []ace.HandlerFunc{pullRequestHandler},
 		},
 	}

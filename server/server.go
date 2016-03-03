@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"strconv"
 
 	"github.com/BaristaVentures/errand-boy/routers/github"
@@ -19,6 +18,5 @@ func (s *Server) BootUp() {
 	a := ace.Default()
 	// Add GitHub routes.
 	github.Instance().SetUpRoutes(a.Router)
-	fmt.Printf("Errand Boy is listening for your commands on port %d.\n", s.Port)
 	a.Run(":" + strconv.Itoa(s.Port))
 }
