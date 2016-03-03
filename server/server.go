@@ -14,7 +14,7 @@ type Server struct {
 
 // BootUp starts the server.
 func (s *Server) BootUp() {
-	// Set the default ace instance with logging middleware.
+	// Set the default ace instance with logging mIDdleware.
 	a := ace.Default()
 	// Add GitHub routes.
 	github.Instance().SetUpRoutes(a.Router)

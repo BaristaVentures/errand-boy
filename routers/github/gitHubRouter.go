@@ -12,18 +12,6 @@ type GitHubRouter struct {
 	routes routers.Routes
 }
 
-type pullRequestPayload struct {
-	Action      string       `json:"action"`
-	Number      int          `json:"number"`
-	PullRequest *pullRequest `json:"pull_request"`
-}
-
-type pullRequest struct {
-	Title    string `json:"title"`
-	URL      string `json:"url"`
-	MergedAt string `json:"merged_at"`
-}
-
 func init() {
 	instance = GitHubRouter{}
 	instance.routes = routers.Routes{
