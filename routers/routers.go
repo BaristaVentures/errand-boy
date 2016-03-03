@@ -14,5 +14,5 @@ type Routes []*Route
 
 // Router identifies a struct as a router.
 type Router interface {
-	GetRoutes() Routes
+	SetUpRoutes(*ace.Router)
 }

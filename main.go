@@ -1,8 +1,8 @@
 package main
 
+import "github.com/BaristaVentures/errand-boy/server"
+
 func main() {
-	server := server{
-		port: 8080,
-	}
-	server.bootUp()
+	s := server.Server{Port: 8080}
+	s.BootUp()
 }
