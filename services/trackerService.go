@@ -15,15 +15,22 @@ type TrackerStory struct {
 }
 
 func init() {
-	tracker = pivotal.NewClient(os.Getenv("PT_API_KEY"))
+	tracker = pivotal.NewClient(os.Getenv("PT_API_TOKEN"))
 }
 
 // SetStoryFinished sets the story with the given ID as finished.
-func SetStoryFinished(projectID, ID int) (*pivotal.Story, error) {
+func SetStoryFinished(projectID, storyID int) (*pivotal.Story, error) {
 	storyRequest := &pivotal.StoryRequest{State: pivotal.StoryStateFinished}
-	s, _, err := tracker.Stories.Update(projectID, ID, storyRequest)
+	s, _, err := tracker.Stories.Update(projectID, storyID, storyRequest)
 	if err != nil {
 		return nil, err
 	}
 	return s, nil
+}
+
+// CommentOnStory adds a comment to story with the given ID.
+func CommentOnStory(projectID, storyID int, comment string) (*pivotal.Comment, error) {
+	pivotalComment := &pivotal.Comment{Text: comment, StoryId: storyID}
+	updatedComment, _, err := tracker.Stories.AddComment(projectID, storyID, pivotalComment)
+	return updatedComment, err
 }

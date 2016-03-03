@@ -20,6 +20,7 @@ type pullRequest struct {
 func pullRequestHandler(c *ace.C) {
 	var prPayload pullRequestPayload
 	c.ParseJSON(&prPayload)
+
 	switch prPayload.Action {
 	case "opened":
 		projectID, storyID, ok := parseTrackerCode(prPayload.PullRequest.Title)
@@ -27,11 +28,14 @@ func pullRequestHandler(c *ace.C) {
 			//FIXME: should this be a 400 tho
 			c.AbortWithStatus(400)
 		}
+		// Set the story as finished.
 		story, err := trackerService.SetStoryFinished(projectID, storyID)
 		if err != nil {
 			c.AbortWithStatus(500)
 		}
+
 		c.JSON(200, story)
+		// Add a comment indicating the PR's URL.
+		trackerService.CommentOnStory(projectID, storyID, "Check the PR @ "+prPayload.PullRequest.URL)
 	}
-	c.JSON(200, struct{}{})
 }
