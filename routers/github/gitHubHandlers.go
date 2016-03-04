@@ -5,6 +5,8 @@ import (
 	"github.com/plimble/ace"
 )
 
+var trackerService tracker.Service
+
 type pullRequestPayload struct {
 	Action      string       `json:"action"`
 	Number      string       `json:"number"`
@@ -12,9 +14,13 @@ type pullRequestPayload struct {
 }
 
 type pullRequest struct {
-	Title    string `json:"title"`
-	URL      string `json:"url"`
-	MergedAt string `json:"merged_at"`
+	Title string `json:"title"`
+	URL   string `json:"url"`
+}
+
+// SetTrackerService sets the tracker.Service instance to be used.
+func SetTrackerService(service tracker.Service) {
+	trackerService = service
 }
 
 func pullRequestHandler(c *ace.C) {
@@ -23,15 +29,17 @@ func pullRequestHandler(c *ace.C) {
 
 	switch prPayload.Action {
 	case "opened":
-		projectID, storyID, ok := parseTrackerCode(prPayload.PullRequest.Title)
-		if !ok {
+		projectID, storyID, err := parseTrackerCode(prPayload.PullRequest.Title)
+		if err != nil {
 			//FIXME: should this be a 400 tho
 			c.AbortWithStatus(400)
+			return
 		}
 		// Set the story as finished.
-		story, err := trackerService.SetStoryFinished(projectID, storyID)
+		story, err := trackerService.SetStoryState(projectID, storyID, "finished")
 		if err != nil {
 			c.AbortWithStatus(500)
+			return
 		}
 
 		c.JSON(200, story)

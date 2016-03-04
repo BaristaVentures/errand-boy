@@ -1,7 +1,10 @@
 package github
 
 import (
+	"os"
+
 	"github.com/BaristaVentures/errand-boy/routers"
+	"github.com/BaristaVentures/errand-boy/services"
 	"github.com/plimble/ace"
 )
 
@@ -13,6 +16,8 @@ type GitHubRouter struct {
 }
 
 func init() {
+	service := tracker.NewService(os.Getenv("PT_API_TOKEN"))
+	SetTrackerService(service)
 	instance = GitHubRouter{}
 	instance.routes = routers.Routes{
 		&routers.Route{

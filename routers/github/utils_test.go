@@ -3,26 +3,29 @@ package github
 import (
 	"testing"
 
-	"github.com/BaristaVentures/errand-boy/services"
 	"github.com/hooklift/assert"
 )
 
 func TestParseTrackerCodeOk(t *testing.T) {
-	story := parseTrackerCode("[PT 13375p34k 1234]")
-	assert.Equals(t, "13375p34k", story.ProjectID)
-	assert.Equals(t, "1234", story.ID)
+	projectID, storyID, err := parseTrackerCode("[PT 12321312 1234]")
+	assert.Ok(t, err)
+	assert.Equals(t, 12321312, projectID)
+	assert.Equals(t, 1234, storyID)
 }
 
 func TestParseTrackerCodeLong(t *testing.T) {
-	story := parseTrackerCode("Solve all the project's issues. [PT 13375p34k 1234]")
-	assert.Equals(t, "13375p34k", story.ProjectID)
-	assert.Equals(t, "1234", story.ID)
+	projectID, storyID, err := parseTrackerCode("Solve all the project's issues. [PT 123123 1234]")
+	assert.Ok(t, err)
+	assert.Equals(t, 123123, projectID)
+	assert.Equals(t, 1234, storyID)
 }
 
 func TestParseTrackerCodeInvalid(t *testing.T) {
-	assert.Equals(t, (*trackerService.TrackerStory)(nil), parseTrackerCode("[PT 13375p34k"))
+	_, _, err := parseTrackerCode("[PT 13375p34k")
+	assert.Cond(t, err != nil, err.Error())
 }
 
 func TestParseTrackerCodeMissing(t *testing.T) {
-	assert.Equals(t, (*trackerService.TrackerStory)(nil), parseTrackerCode("Nope."))
+	_, _, err := parseTrackerCode("Nope.")
+	assert.Cond(t, err != nil, err.Error())
 }
