@@ -12,7 +12,7 @@ type Route struct {
 // Routes is a Route array.
 type Routes []*Route
 
-// Router identifies a struct as a router.
+// Router Identifies a struct as a router.
 type Router interface {
-	GetRoutes() Routes
+	SetUpRoutes(*ace.Router)
 }
