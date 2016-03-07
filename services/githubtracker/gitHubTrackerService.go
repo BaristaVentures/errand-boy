@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	github "github.com/BaristaVentures/errand-boy/routers/github"
+	"github.com/BaristaVentures/errand-boy/routers/github"
 	"github.com/BaristaVentures/errand-boy/services/tracker"
 	"github.com/BaristaVentures/errand-boy/utils"
 )
