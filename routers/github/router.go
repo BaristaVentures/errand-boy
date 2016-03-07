@@ -30,7 +30,7 @@ func Instance() routers.Router {
 
 // SetUpRoutes sets up this router's routes.
 func (gh *GitHubRouter) SetUpRoutes(router *ace.Router) {
-	router = router.Group("/hooks/gh")
+	router = router.Group("/gh")
 	for _, r := range gh.routes {
 		router.Handle(r.Method, r.Path, r.Handlers)
 	}

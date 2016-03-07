@@ -19,6 +19,6 @@ func (s *Server) BootUp() {
 	// Set the default ace instance with logging mIDdleware.
 	a := ace.Default()
 	// Add GitHub routes.
-	ghRouter.Instance().SetUpRoutes(a.Router)
+	ghRouter.Instance().SetUpRoutes(a.Router.Group("/hooks"))
 	a.Run(":" + strconv.Itoa(s.Port))
 }
