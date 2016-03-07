@@ -18,7 +18,8 @@ type Server struct {
 func (s *Server) BootUp() {
 	// Set the default ace instance with logging mIDdleware.
 	a := ace.Default()
+	hooksRouter := a.Router.Group("/hooks")
 	// Add GitHub routes.
-	ghRouter.Instance().SetUpRoutes(a.Router.Group("/hooks"))
+	ghRouter.Instance().SetUpRoutes(hooksRouter.Group("/gh"))
 	a.Run(":" + strconv.Itoa(s.Port))
 }
