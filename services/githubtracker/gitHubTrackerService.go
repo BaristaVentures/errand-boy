@@ -1,10 +1,10 @@
-package github
+package githubtracker
 
 import (
 	"errors"
 	"os"
 
-	ghRouter "github.com/BaristaVentures/errand-boy/routers/github"
+	github "github.com/BaristaVentures/errand-boy/routers/github"
 	"github.com/BaristaVentures/errand-boy/services/tracker"
 	"github.com/BaristaVentures/errand-boy/utils"
 )
@@ -14,7 +14,7 @@ var trackerService tracker.Service
 func init() {
 	service := tracker.NewService(os.Getenv("PT_API_TOKEN"))
 	SetTrackerService(service)
-	ghRouter.AddObserver("pr", pullRequestHandler)
+	github.AddObserver("pr", pullRequestHandler)
 }
 
 // SetTrackerService sets the tracker.Service instance to be used.
@@ -23,7 +23,7 @@ func SetTrackerService(service tracker.Service) {
 }
 
 var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
-	prPayload := payload.(ghRouter.PullRequestPayload)
+	prPayload := payload.(github.PullRequestPayload)
 	switch prPayload.Action {
 	case "opened":
 		projectID, storyID, err := parseTrackerCode(prPayload.PR.Title)
