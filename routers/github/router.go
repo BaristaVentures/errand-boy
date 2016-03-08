@@ -2,7 +2,7 @@ package github
 
 import (
 	"github.com/BaristaVentures/errand-boy/routers"
-	"github.com/plimble/ace"
+	"github.com/gorilla/mux"
 )
 
 var instance GitHubRouter
@@ -16,9 +16,9 @@ func init() {
 	instance = GitHubRouter{}
 	instance.routes = routers.Routes{
 		&routers.Route{
-			Path:     "/pr",
-			Method:   "POST",
-			Handlers: []ace.HandlerFunc{pullRequestHandler},
+			Path:    "/pr",
+			Method:  "POST",
+			Handler: pullRequestHandler,
 		},
 	}
 }
@@ -29,8 +29,9 @@ func Instance() routers.Router {
 }
 
 // SetUpRoutes sets up this router's routes.
-func (gh *GitHubRouter) SetUpRoutes(router *ace.Router) {
+func (gh *GitHubRouter) SetUpRoutes(router *mux.Router) {
 	for _, r := range gh.routes {
-		router.Handle(r.Method, r.Path, r.Handlers)
+		router.Methods(r.Method).Path(r.Path).Handler(r.Handler)
+		// router.Handle(r.Method, r.Path, r.Handlers)
 	}
 }

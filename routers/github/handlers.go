@@ -1,21 +1,24 @@
 package github
 
 import (
+	"encoding/json"
 	"errors"
+	"net/http"
 
 	"github.com/BaristaVentures/errand-boy/utils"
-	"github.com/plimble/ace"
 )
 
 var events = []string{"pr"}
 var eventsSubs = make(map[string]*utils.Observers)
 
+// PullRequestPayload represents the body of github's PR webhook.
 type PullRequestPayload struct {
 	Action string       `json:"action"`
 	Number string       `json:"number"`
 	PR     *PullRequest `json:"pull_request"`
 }
 
+// PullRequest represents the PR data contained in a PullRequestPayload that is relevant for Errand Boy.
 type PullRequest struct {
 	Title string `json:"title"`
 	URL   string `json:"url"`
@@ -28,6 +31,7 @@ func init() {
 	}
 }
 
+// AddObserver adds an observer to the list.
 func AddObserver(event string, observer utils.Observer) error {
 	_, ok := eventsSubs[event]
 	if !ok {
@@ -37,10 +41,10 @@ func AddObserver(event string, observer utils.Observer) error {
 	return nil
 }
 
-func pullRequestHandler(c *ace.C) {
+func pullRequestHandler(res http.ResponseWriter, req *http.Request) {
 	var prPayload PullRequestPayload
-	c.ParseJSON(&prPayload)
-	// TODO: handle possible publisher errors.
+	json.NewDecoder(req.Body).Decode(&prPayload)
+	// // TODO: handle possible publisher errors.
 	_ = eventsSubs["pr"].Publish(prPayload)
-	c.String(200, "")
+	res.WriteHeader(http.StatusOK)
 }
