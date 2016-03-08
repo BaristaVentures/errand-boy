@@ -18,5 +18,6 @@ type Routes []*Route
 
 // Router Identifies a struct as a router.
 type Router interface {
+	// Takes a *mux.Router to configure its internal routes.
 	SetUpRoutes(*mux.Router)
 }

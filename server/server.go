@@ -20,6 +20,6 @@ func (s *Server) BootUp() {
 	r := mux.NewRouter()
 	hooksRouter := r.PathPrefix("/hooks").Subrouter()
 	// Add GitHub routes.
-	github.Instance().SetUpRoutes(hooksRouter.PathPrefix("/gh").Subrouter())
+	github.NewRouter().SetUpRoutes(hooksRouter.PathPrefix("/gh").Subrouter())
 	http.ListenAndServe(":"+strconv.Itoa(s.Port), r)
 }
