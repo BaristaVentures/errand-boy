@@ -17,8 +17,9 @@ func NewRouter() routers.Router {
 	instance = Router{}
 	instance.routes = routers.Routes{
 		&routers.Route{
-			Path:   "/pr",
-			Method: "POST",
+			Path:    "/pr",
+			Method:  "POST",
+			Handler: pullRequestHandler,
 		},
 	}
 	return &instance

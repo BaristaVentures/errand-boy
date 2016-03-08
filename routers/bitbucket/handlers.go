@@ -11,17 +11,23 @@ import (
 var events = []string{"pr"}
 var eventsSubs = make(map[string]*utils.Observers)
 
-// PullRequestPayload represents the body of github's PR webhook.
+// PullRequestPayload represents the body of BitBucket's PR webhook.
 type PullRequestPayload struct {
-	Action string       `json:"action"`
-	Number string       `json:"number"`
-	PR     *PullRequest `json:"pull_request"`
+	PR PullRequest `json:"pullrequest"`
 }
 
-// PullRequest represents the PR data contained in a PullRequestPayload that is relevant for Errand Boy.
 type PullRequest struct {
 	Title string `json:"title"`
-	URL   string `json:"url"`
+	State string `json:"state"`
+	URLs  URL    `json:"links"`
+}
+
+type URL struct {
+	HTML Link `json:"html"`
+}
+
+type Link struct {
+	Href string `json:"href"`
 }
 
 func init() {
