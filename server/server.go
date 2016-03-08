@@ -1,12 +1,13 @@
 package server
 
 import (
+	"net/http"
 	"strconv"
 
 	"github.com/BaristaVentures/errand-boy/routers/github"
 	// Importing it as a blank package causes its init method to be called.
 	_ "github.com/BaristaVentures/errand-boy/services/repotracker"
-	"github.com/plimble/ace"
+	"github.com/gorilla/mux"
 )
 
 // Server represents the server's config.
@@ -16,10 +17,9 @@ type Server struct {
 
 // BootUp starts the server.
 func (s *Server) BootUp() {
-	// Set the default ace instance with logging middleware.
-	a := ace.Default()
-	hooksRouter := a.Router.Group("/hooks")
+	r := mux.NewRouter()
+	hooksRouter := r.PathPrefix("/hooks").Subrouter()
 	// Add GitHub routes.
-	github.Instance().SetUpRoutes(hooksRouter.Group("/gh"))
-	a.Run(":" + strconv.Itoa(s.Port))
+	github.Instance().SetUpRoutes(hooksRouter.PathPrefix("/gh").Subrouter())
+	http.ListenAndServe(":"+strconv.Itoa(s.Port), r)
 }
