@@ -5,7 +5,7 @@ import (
 
 	"github.com/BaristaVentures/errand-boy/routers/github"
 	// Importing it as a blank package causes its init method to be called.
-	_ "github.com/BaristaVentures/errand-boy/services/githubtracker"
+	_ "github.com/BaristaVentures/errand-boy/services/repotracker"
 	"github.com/plimble/ace"
 )
 
