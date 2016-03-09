@@ -4,9 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/BaristaVentures/errand-boy/routers/bitbucket"
-	"github.com/BaristaVentures/errand-boy/routers/github"
 	// Importing it as a blank package causes its init method to be called.
+	"github.com/BaristaVentures/errand-boy/routers/repos"
 	_ "github.com/BaristaVentures/errand-boy/services/repotracker"
 	"github.com/gorilla/mux"
 )
@@ -20,11 +19,23 @@ type Server struct {
 func (s *Server) BootUp() {
 	r := mux.NewRouter()
 	r.StrictSlash(true)
-	hooksSubRouter := r.PathPrefix("/hooks").Subrouter()
+
+	baseRoute := r.PathPrefix("/")
+
+	hooksSubRoute := r.PathPrefix("/hooks")
+	hooksSubRouter := hooksSubRoute.Subrouter()
+
+	reposSubRouter := hooksSubRouter.PathPrefix("/repos").Subrouter()
+	// bbSubRouter := hooksSubRouter.PathPrefix("/bb").Subrouter()
+	// ghSubRouter := hooksSubRouter.PathPrefix("/gh").Subrouter()
+
+	baseRoute.Handler(repos.NormalizePRPayload(hooksSubRouter))
+
+	repos.Router(reposSubRouter)
 	// Add GitHub routes.
-	hooksSubRouter.PathPrefix("/gh").Handler(github.Router())
+	// github.Router(ghSubRouter)
 	// Add BitBucket routes.
-	hooksSubRouter.PathPrefix("/bb").Handler(bitbucket.NormalizePRPayload(bitbucket.Router()))
+	// bitbucket.Router(bbSubRouter)
 	// Start listening.
 	http.ListenAndServe(":"+strconv.Itoa(s.Port), r)
 }
