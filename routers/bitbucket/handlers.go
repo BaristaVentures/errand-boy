@@ -54,3 +54,7 @@ func pullRequestHandler(res http.ResponseWriter, req *http.Request) {
 	_ = eventsSubs["pr"].Publish(prPayload)
 	res.WriteHeader(http.StatusOK)
 }
+
+func papayaHandler(res http.ResponseWriter, req *http.Request) {
+	res.WriteHeader(http.StatusInternalServerError)
+}

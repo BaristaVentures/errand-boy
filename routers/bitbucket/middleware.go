@@ -5,9 +5,10 @@ import (
 	"net/http"
 )
 
-func NormalizePRPayload(handler http.Handler) http.Handler {
+// NormalizePRPayload turns a bitbucket-specific PR payload into a general one.
+func NormalizePRPayload(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(r.URL.Path)
-		handler.ServeHTTP(w, r)
+		next.ServeHTTP(w, r)
 	})
 }

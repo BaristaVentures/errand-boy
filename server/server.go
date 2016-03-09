@@ -22,11 +22,9 @@ func (s *Server) BootUp() {
 	r.StrictSlash(true)
 	hooksSubRouter := r.PathPrefix("/hooks").Subrouter()
 	// Add GitHub routes.
-	ghSubRouter := hooksSubRouter.PathPrefix("/gh").Subrouter()
-	github.NewRouter().SetUpRoutes(ghSubRouter)
+	hooksSubRouter.PathPrefix("/gh").Handler(github.Router())
 	// Add BitBucket routes.
-	bbSubRouter := hooksSubRouter.PathPrefix("/bb").Subrouter()
-	bitbucket.NewRouter().SetUpRoutes(bbSubRouter)
+	hooksSubRouter.PathPrefix("/bb").Handler(bitbucket.NormalizePRPayload(bitbucket.Router()))
 	// Start listening.
 	http.ListenAndServe(":"+strconv.Itoa(s.Port), r)
 }
