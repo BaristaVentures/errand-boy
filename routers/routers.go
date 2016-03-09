@@ -11,7 +11,10 @@ type Route struct {
 	Path    string
 	Method  string
 	Handler http.HandlerFunc
+	Middleware
 }
+
+type Middleware func(http.Handler) http.Handler
 
 // Routes is a Route array.
 type Routes []*Route

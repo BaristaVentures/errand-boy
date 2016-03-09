@@ -19,10 +19,14 @@ type Server struct {
 // BootUp starts the server.
 func (s *Server) BootUp() {
 	r := mux.NewRouter()
-	hooksRouter := r.PathPrefix("/hooks").Subrouter()
+	r.StrictSlash(true)
+	hooksSubRouter := r.PathPrefix("/hooks").Subrouter()
 	// Add GitHub routes.
-	github.NewRouter().SetUpRoutes(hooksRouter.PathPrefix("/gh").Subrouter())
+	ghSubRouter := hooksSubRouter.PathPrefix("/gh").Subrouter()
+	github.NewRouter().SetUpRoutes(ghSubRouter)
 	// Add BitBucket routes.
-	bitbucket.NewRouter().SetUpRoutes(hooksRouter.PathPrefix("/bb").Subrouter())
+	bbSubRouter := hooksSubRouter.PathPrefix("/bb").Subrouter()
+	bitbucket.NewRouter().SetUpRoutes(bbSubRouter)
+	// Start listening.
 	http.ListenAndServe(":"+strconv.Itoa(s.Port), r)
 }
