@@ -23,7 +23,7 @@ func SetTrackerService(service tracker.Service) {
 }
 
 var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
-	prPayload := payload.(repos.GenericPRPayload)
+	prPayload := payload.(repos.PullRequest)
 	switch prPayload.Status {
 	case "opened":
 		projectID, storyID, err := parseTrackerCode(prPayload.Title)

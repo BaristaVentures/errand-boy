@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	// Importing it as a blank package causes its init method to be called.
 	"github.com/BaristaVentures/errand-boy/routers/repos"
+	// Importing it as a blank package causes its init method to be called.
 	_ "github.com/BaristaVentures/errand-boy/services/repotracker"
 	"github.com/gorilla/mux"
 )
@@ -26,16 +26,9 @@ func (s *Server) BootUp() {
 	hooksSubRouter := hooksSubRoute.Subrouter()
 
 	reposSubRouter := hooksSubRouter.PathPrefix("/repos").Subrouter()
-	// bbSubRouter := hooksSubRouter.PathPrefix("/bb").Subrouter()
-	// ghSubRouter := hooksSubRouter.PathPrefix("/gh").Subrouter()
 
 	baseRoute.Handler(repos.NormalizePRPayload(hooksSubRouter))
 
-	repos.Router(reposSubRouter)
-	// Add GitHub routes.
-	// github.Router(ghSubRouter)
-	// Add BitBucket routes.
-	// bitbucket.Router(bbSubRouter)
-	// Start listening.
+	repos.Route(reposSubRouter)
 	http.ListenAndServe(":"+strconv.Itoa(s.Port), r)
 }
