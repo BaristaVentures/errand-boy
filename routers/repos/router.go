@@ -28,9 +28,9 @@ func AddObserver(event string, observer utils.Observer) error {
 	return nil
 }
 
-// Route returns a preconfigured *mux.Router.
+// Route returns a configured *mux.Router.
 func Route(router *mux.Router) *mux.Router {
-	routes := routers.Routes{
+	routes := &routers.Routes{
 		&routers.Route{
 			Path:    "/pr",
 			Method:  "POST",
@@ -38,7 +38,7 @@ func Route(router *mux.Router) *mux.Router {
 		},
 	}
 
-	for _, r := range routes {
+	for _, r := range *routes {
 		router.Methods(r.Method).Path(r.Path).Handler(r.Handler)
 	}
 	return router
