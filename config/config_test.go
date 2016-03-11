@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -47,7 +47,7 @@ func TestLoadConfig(t *testing.T) {
 	file.WriteString(formattedContent)
 	file.Close()
 
-	config, err := LoadConfig(configPath)
+	config, err := Load(configPath)
 	assert.Ok(t, err)
 
 	assert.Equals(t, trackerAPIToken, config.TrackerAPIToken)
@@ -63,6 +63,6 @@ func TestLoadConfig(t *testing.T) {
 func TestLoadMissingConfig(t *testing.T) {
 	configPath := "./missing_eb-config.json"
 
-	_, err := LoadConfig(configPath)
+	_, err := Load(configPath)
 	assert.Cond(t, err != nil, "Error shouldn't be nil.")
 }
