@@ -32,9 +32,9 @@ acbuild --debug begin
 trap "{ export EXT=$?; acbuild --debug end && exit $EXT; }" EXIT
 
 acbuild --debug set-name barista-v.com/errand-boy
-acbuild --debug dep add quay.io/sameersbn/ubuntu
 acbuild --debug copy errand-boy /bin/errand-boy
-acbuild --debug set-exec -- /bin/errand-boy -p 8080
+acbuild --debug copy eb-conf.json /bin/eb-conf.json
+acbuild --debug set-exec -- /bin/errand-boy -p 8080 -c /bin/eb-conf.json
 acbuild --debug port add www tcp 8080
 acbuild --debug label add version "$VERSION"
 acbuild --debug label add arch amd64
