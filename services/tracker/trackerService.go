@@ -1,9 +1,9 @@
 package tracker
 
-import "github.com/salsita/go-pivotaltracker/v5/pivotal"
+import "github.com/BaristaVentures/go-pivotaltracker/v5/pivotal"
 
-// NewService returns a default TrackerService
-func NewService(apiToken string) Service {
+// New returns a default TrackerService
+func New(apiToken string) Service {
 	return &trackerService{apiToken}
 }
 
@@ -11,6 +11,7 @@ func NewService(apiToken string) Service {
 type Service interface {
 	SetStoryState(projectID, storyID int, state string) (*pivotal.Story, error)
 	CommentOnStory(projectID, storyID int, comment string) (*pivotal.Comment, error)
+	GetStoryComments(projectID, storyID int) ([]*pivotal.Comment, error)
 }
 
 type trackerService struct {
@@ -31,4 +32,11 @@ func (ts *trackerService) CommentOnStory(projectID, storyID int, comment string)
 	pivotalComment := &pivotal.Comment{Text: comment, StoryId: storyID}
 	updatedComment, _, err := client.Stories.AddComment(projectID, storyID, pivotalComment)
 	return updatedComment, err
+}
+
+// GetStoryComments returns the list of comments for a given story.
+func (ts *trackerService) GetStoryComments(projectID, storyID int) ([]*pivotal.Comment, error) {
+	client := pivotal.NewClient(ts.apiToken)
+	comments, _, err := client.Stories.ListComments(projectID, storyID)
+	return comments, err
 }
