@@ -13,10 +13,16 @@ $ ./errand-boy [-p <port=8080>]
 ## Config file
 Errand Boy requires a configuration file to know what Pivotal Tracker projects map to which
 repositories.
+
+**Notice**: It's a bad practice to have auth tokens in plain text. Because of that,
+`tracker_api_token` and each repository `token` value should be names of  environment variables that
+Errand Boy can access.
+
 Example:
+
 ```json
 {
-  "tracker_api_token": "PT_API_TOKEN",
+  "tracker_api_token": "PT_API_TOKEN_ENV_VAR",
   "projects": [
     {
       "tracker_id": 123581321,
@@ -24,12 +30,12 @@ Example:
         {
           "source": "github",
           "name": "awesome-repo-1",
-          "token": "REPO_1_TOKEN"
+          "token": "REPO_1_TOKEN_ENV_VAR"
         },
         {
           "source": "github",
           "name": "awesome-repo-2",
-          "token": "REPO_2_TOKEN"
+          "token": "REPO_2_TOKEN_ENV_VAR"
         }
       ]
     }
@@ -46,7 +52,9 @@ repositories.
 5. Profit!
 
 ## Scripts
-To build a statically linked Errand Boy executable: `CGO_ENABLED=0 GOOS=linux go build -o errand-boy -a -tags netgo -ldflags '-w' .`
+
+**build-sle**: Builds an statically linked Errand Boy executable (you'll need it to run it inside
+an ACI).
 
 **build-aci**: Builds an Errand Boy container image in ACI format.
 Usage: `sudo BINARYDIR=<binary dir> BUILDDIR=<build dir> scripts/build-aci <version>`
