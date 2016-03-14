@@ -1,7 +1,6 @@
 errand-boy
 start-eb.sh
 *.aci
-eb-conf.json
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o

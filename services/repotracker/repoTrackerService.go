@@ -2,6 +2,7 @@ package repotracker
 
 import (
 	"errors"
+	"os"
 
 	"github.com/BaristaVentures/errand-boy/config"
 	"github.com/BaristaVentures/errand-boy/routers/repos"
@@ -16,7 +17,7 @@ func init() {
 	if len(apiToken) == 0 {
 		panic(errors.New("Pivotal Tracker API Token not set in config file."))
 	}
-	service := tracker.NewService(apiToken)
+	service := tracker.NewService(os.Getenv(apiToken))
 	SetTrackerService(service)
 	repos.AddObserver("pr", pullRequestHandler)
 }

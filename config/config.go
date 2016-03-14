@@ -48,5 +48,7 @@ func Load(path string) (*Config, error) {
 
 // Current returns the current config.
 func Current() *Config {
+	// TODO: Maybe we should check the last time the config file was "touched", compare it with
+	// errand boy's start time. If it was modified after, reload the config.
 	return config
 }

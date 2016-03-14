@@ -11,19 +11,24 @@ $ ./errand-boy [-p <port=8080>]
 ```
 
 ## Config file
-Errand Boy requires a config file to know what Pivotal Tracker projects map to which repositories.
+Errand Boy requires a configuration file to know what Pivotal Tracker projects map to which repositories.
 Example:
 ```json
 {
-  "tracker_api_token": "asb1234basdasd",
+  "tracker_api_token": "PT_API_TOKEN",
   "projects": [
     {
       "tracker_id": 123581321,
       "repos": [
         {
-          "source": "github | bitbucket | gitlab",
-          "name": "awesome-repo",
-          "token": "?"
+          "source": "github",
+          "name": "awesome-repo-1",
+          "token": "REPO_1_TOKEN"
+        },
+        {
+          "source": "github",
+          "name": "awesome-repo-2",
+          "token": "REPO_2_TOKEN"
         }
       ]
     }
