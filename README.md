@@ -1,5 +1,5 @@
 # errand-boy
-A service to integrate GitHub and Pivotal Tracker events.
+A service to integrate GitHub and Pivotal Tracker events to your project management workflow.
 
 ## Run it
 Clone the repository and, in the root:
@@ -11,7 +11,8 @@ $ ./errand-boy [-p <port=8080>]
 ```
 
 ## Config file
-Errand Boy requires a configuration file to know what Pivotal Tracker projects map to which repositories.
+Errand Boy requires a configuration file to know what Pivotal Tracker projects map to which
+repositories.
 Example:
 ```json
 {
@@ -35,3 +36,11 @@ Example:
   ]
 }
 ```
+
+## Steps (TODO: add pics of the process)
+1. In your repository's settings, under "Webhooks & services", add a new webhook to the GitHub
+repositories.
+2. Enter the URL where the hook's POST request will be sent.
+3. Select "Let me select individual events." and tick the Pull Request checkbox.
+4. Click on "Add webhook".
+5. Profit!
