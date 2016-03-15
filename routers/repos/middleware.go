@@ -18,8 +18,8 @@ func NormalizePRPayload(next http.Handler) http.Handler {
 			genPayload := prPayload.ToGenericPR()
 			genPayloadBytes, _ := json.Marshal(genPayload)
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(genPayloadBytes))
-		default:
-			// FIXME: Let's assume it's bitbucket
+		case len(r.Header.Get("X-Event-Key")) > 0:
+			// If the X-Event-Key header is set, It's bitbucket.
 			prPayload := &bitBucketPRPayload{}
 			json.NewDecoder(r.Body).Decode(&prPayload)
 			genPayload := prPayload.ToGenericPR()
