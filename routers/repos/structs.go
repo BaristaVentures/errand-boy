@@ -1,6 +1,9 @@
 package repos
 
-import "strings"
+import (
+	log "github.com/Sirupsen/logrus"
+	"strings"
+)
 
 // PRConverter identifies service-specific Pull Request payloads (like GitHub's and BitBucket's),
 // that can be converted into a generic PullRequest.
@@ -45,17 +48,41 @@ type bitBucketLink struct {
 	Href string `json:"href"`
 }
 
+// debug method
+func (generalizedPR *PullRequest) debug(logger *log.Entry) *log.Entry {
+	return logger.WithFields(log.Fields{
+		"status": generalizedPR.Status,
+		"title":  generalizedPR.Title,
+		"url":    generalizedPR.URL,
+	})
+}
+
+func createLogContext(from string) *log.Entry {
+	return log.WithFields(log.Fields{
+		"method": "ToGenericPR",
+		"from":   from,
+	})
+}
+
 // ToGenericPR transforms a GitHubPRPayload into a Generic one.
 func (ghPayload *gitHubPRPayload) ToGenericPR() *PullRequest {
+	contextLogger := createLogContext("github")
+	contextLogger.Info("Starting normalization")
+
 	genericPayload := &PullRequest{}
 	genericPayload.Status = ghPayload.Action
 	genericPayload.Title = ghPayload.PR.Title
 	genericPayload.URL = ghPayload.PR.HtmlURL
+
+	genericPayload.debug(contextLogger).Info("Finish normalization")
 	return genericPayload
 }
 
 // ToGenericPR transforms a BitBucketPRPayload into a Generic one.
 func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
+	contextLogger := createLogContext("bitbucket")
+	contextLogger.Info("Starting pr normalization")
+
 	genericPayload := &PullRequest{}
 	// bbPayload.PR.State can be OPEN|MERGED|DECLINED
 	if bbPayload.PR.State == "OPEN" {
@@ -66,5 +93,6 @@ func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
 	genericPayload.Title = bbPayload.PR.Title
 	genericPayload.URL = bbPayload.PR.URLs.HTML.Href
 
+	genericPayload.debug(contextLogger).Info("Finish normalization")
 	return genericPayload
 }
