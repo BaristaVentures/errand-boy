@@ -49,39 +49,39 @@ type bitBucketLink struct {
 }
 
 // debug method
-func (generalizedPR *PullRequest) debug(logger *log.Entry) *log.Entry {
-	return logger.WithFields(log.Fields{
+func (generalizedPR *PullRequest) debug(logger *log.Entry) {
+	logger.WithFields(log.Fields{
 		"status": generalizedPR.Status,
 		"title":  generalizedPR.Title,
 		"url":    generalizedPR.URL,
-	})
+	}).Info("Normalized fields")
 }
 
 func createLogContext(from string) *log.Entry {
-	return log.WithFields(log.Fields{
+	context := log.WithFields(log.Fields{
 		"method": "ToGenericPR",
 		"from":   from,
 	})
+	context.Info("Starting Normalization")
+	return context
 }
 
 // ToGenericPR transforms a GitHubPRPayload into a Generic one.
 func (ghPayload *gitHubPRPayload) ToGenericPR() *PullRequest {
 	contextLogger := createLogContext("github")
-	contextLogger.Info("Starting normalization")
 
 	genericPayload := &PullRequest{}
 	genericPayload.Status = ghPayload.Action
 	genericPayload.Title = ghPayload.PR.Title
 	genericPayload.URL = ghPayload.PR.HtmlURL
 
-	genericPayload.debug(contextLogger).Info("Finish normalization")
+	genericPayload.debug(contextLogger)
 	return genericPayload
 }
 
 // ToGenericPR transforms a BitBucketPRPayload into a Generic one.
 func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
 	contextLogger := createLogContext("bitbucket")
-	contextLogger.Info("Starting pr normalization")
 
 	genericPayload := &PullRequest{}
 	// bbPayload.PR.State can be OPEN|MERGED|DECLINED
@@ -93,6 +93,6 @@ func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
 	genericPayload.Title = bbPayload.PR.Title
 	genericPayload.URL = bbPayload.PR.URLs.HTML.Href
 
-	genericPayload.debug(contextLogger).Info("Finish normalization")
+	genericPayload.debug(contextLogger)
 	return genericPayload
 }
