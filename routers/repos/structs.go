@@ -49,11 +49,11 @@ type bitBucketLink struct {
 }
 
 // debug method
-func (generalizedPR *PullRequest) debug(logger *log.Entry) {
+func (genericPR *PullRequest) debug(logger *log.Entry) {
 	logger.WithFields(log.Fields{
-		"status": generalizedPR.Status,
-		"title":  generalizedPR.Title,
-		"url":    generalizedPR.URL,
+		"status": genericPR.Status,
+		"title":  genericPR.Title,
+		"url":    genericPR.URL,
 	}).Info("Normalized fields")
 }
 
