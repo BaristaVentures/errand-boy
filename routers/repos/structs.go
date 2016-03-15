@@ -22,8 +22,8 @@ type gitHubPRPayload struct {
 }
 
 type gitHubPR struct {
-	Title string `json:"title"`
-	URL   string `json:"url"`
+	Title   string `json:"title"`
+	HtmlURL string `json:"html_url"`
 }
 
 // bitBucketPRPayload represents the body of BitBucket's PR webhook.
@@ -50,7 +50,7 @@ func (ghPayload *gitHubPRPayload) ToGenericPR() *PullRequest {
 	genericPayload := &PullRequest{}
 	genericPayload.Status = ghPayload.Action
 	genericPayload.Title = ghPayload.PR.Title
-	genericPayload.URL = ghPayload.PR.URL
+	genericPayload.URL = ghPayload.PR.HtmlURL
 	return genericPayload
 }
 
