@@ -11,6 +11,7 @@ type ActivityPayload struct {
 // Resource is a Pivotal Tracker resource.
 type Resource struct {
 	Name string `json:"name"`
+	Kind string `json:"kind"`
 	URL  string `json:"url"`
 	ID   int    `json:"id"`
 }

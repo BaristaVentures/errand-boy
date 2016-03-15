@@ -1,6 +1,10 @@
 package tracker
 
-import "github.com/BaristaVentures/go-pivotaltracker/v5/pivotal"
+import (
+	"errors"
+
+	"github.com/BaristaVentures/go-pivotaltracker/v5/pivotal"
+)
 
 // New returns a default TrackerService
 func New(apiToken string) Service {
@@ -20,6 +24,10 @@ type trackerService struct {
 
 // SetStoryFinished sets the story with the given ID as finished.
 func (ts *trackerService) SetStoryState(projectID, storyID int, state string) (*pivotal.Story, error) {
+	if len(ts.apiToken) == 0 {
+		return nil, errors.New("No Tracker API Token Set.")
+	}
+
 	client := pivotal.NewClient(ts.apiToken)
 	storyRequest := &pivotal.StoryRequest{State: state}
 	s, _, err := client.Stories.Update(projectID, storyID, storyRequest)
@@ -28,6 +36,10 @@ func (ts *trackerService) SetStoryState(projectID, storyID int, state string) (*
 
 // CommentOnStory adds a comment to story with the given ID.
 func (ts *trackerService) CommentOnStory(projectID, storyID int, comment string) (*pivotal.Comment, error) {
+	if len(ts.apiToken) == 0 {
+		return nil, errors.New("No Tracker API Token Set.")
+	}
+
 	client := pivotal.NewClient(ts.apiToken)
 	pivotalComment := &pivotal.Comment{Text: comment, StoryId: storyID}
 	updatedComment, _, err := client.Stories.AddComment(projectID, storyID, pivotalComment)
@@ -36,6 +48,10 @@ func (ts *trackerService) CommentOnStory(projectID, storyID int, comment string)
 
 // GetStoryComments returns the list of comments for a given story.
 func (ts *trackerService) GetStoryComments(projectID, storyID int) ([]*pivotal.Comment, error) {
+	if len(ts.apiToken) == 0 {
+		return nil, errors.New("No Tracker API Token Set.")
+	}
+
 	client := pivotal.NewClient(ts.apiToken)
 	comments, _, err := client.Stories.ListComments(projectID, storyID)
 	return comments, err

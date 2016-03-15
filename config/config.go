@@ -16,14 +16,13 @@ type Config struct {
 
 // Project represents a project-specific config.
 type Project struct {
-	TrackerID int     `json:"tracker_id"`
-	Repos     []*Repo `json:"repos"`
+	TrackerID int              `json:"tracker_id"`
+	Repos     map[string]*Repo `json:"repos"`
 }
 
 // Repo represents a repository
 type Repo struct {
 	Source string `json:"source"`
-	Name   string `json:"name"`
 	Token  string `json:"token"`
 }
 
