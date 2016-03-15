@@ -5,22 +5,21 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 )
 
 // NormalizePRPayload turns a bitbucket-specific PR payload into a general one.
 func NormalizePRPayload(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		url, _ := url.Parse(r.URL.Path)
-		// NOTICE: url.Host == "" when on localhost.
-		switch url.Host {
-		case "github.com":
+		switch {
+		case r.Header.Get("X-GitHub-Event") == "pull_request":
+			// The request comes from GitHub.
 			prPayload := &gitHubPRPayload{}
 			json.NewDecoder(r.Body).Decode(&prPayload)
 			genPayload := prPayload.ToGenericPR()
 			genPayloadBytes, _ := json.Marshal(genPayload)
 			r.Body = ioutil.NopCloser(bytes.NewBuffer(genPayloadBytes))
-		case "bitbucket.com":
+		default:
+			// FIXME: Let's assume it's bitbucket
 			prPayload := &bitBucketPRPayload{}
 			json.NewDecoder(r.Body).Decode(&prPayload)
 			genPayload := prPayload.ToGenericPR()
