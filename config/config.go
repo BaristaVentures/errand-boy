@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
 	"os"
 )
@@ -28,7 +29,11 @@ type Repo struct {
 
 // Load  parses the config from a json file to a *Config and returns it.
 func Load(path string) (*Config, error) {
+	log.WithFields(log.Fields{
+		"path": path,
+	}).Info("Reading errand boy config")
 	reader, err := os.Open(path)
+
 	if err != nil {
 		return nil, err
 	}
