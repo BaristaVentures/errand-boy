@@ -18,6 +18,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
+type pullRequestData struct {
+	Owner    string
+	RepoName string
+	Number   int
+	Host     string
+}
+
 // Route returns a configured *mux.Router.
 func Route(router *mux.Router) *mux.Router {
 	routes := &routers.Routes{
@@ -53,7 +60,6 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 	trackerService := tracker.New(apiToken)
 	comments, err := trackerService.GetStoryComments(trackerProjectID, trackerStoryID)
 	if err != nil {
-		// log the error.
 		logrus.Error(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -69,18 +75,18 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 	visitedRepos := make(map[string]bool)
 
 	for _, comment := range comments {
-		owner, repoName, issueNo, err := extractDataFromComment(comment.Text)
-		if err != nil || visitedRepos[repoName] {
+		prData, err := extractDataFromComment(comment.Text)
+		if err != nil || visitedRepos[prData.RepoName] {
 			// If the right side of the "@" wasn't a valid URL (maybe it was a @mention or an email),
 			// or if we already processed a repo with this name, continue.
 			continue
 		}
 
-		visitedRepos[repoName] = true
+		visitedRepos[prData.RepoName] = true
 		projects := config.Current().Projects
 		for _, project := range projects {
 			if project.TrackerID == trackerProjectID {
-				ghTokenEnvVar := project.Repos[repoName].Token
+				ghTokenEnvVar := project.Repos[prData.RepoName].Token
 				ghToken := os.Getenv(ghTokenEnvVar)
 				if len(ghToken) == 0 {
 					logrus.Error("No value set for env var " + ghTokenEnvVar)
@@ -88,7 +94,10 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				fmtStr := "%s %s the [story](%s) related to this PR in Pivotal Tracker."
 				comment := fmt.Sprintf(fmtStr, activity.Actor.Name, activity.Highlight, resource.URL)
-				ghservice.New(ghToken).CommentOnIssue(owner, repoName, issueNo, comment)
+				switch prData.Host {
+				case "github.com":
+					ghservice.New(ghToken).CommentOnIssue(prData.Owner, prData.RepoName, prData.Number, comment)
+				}
 				break
 			}
 		}
@@ -103,7 +112,7 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // GitHubPRURLData parses a pull request url and extracts its data.
-func extractDataFromComment(comment string) (owner, repo string, number int, err error) {
+func extractDataFromComment(comment string) (*pullRequestData, error) {
 	// Remove all spaces to make it easier to process.
 	commentText := strings.Replace(comment, " ", "", -1)
 	// The errand boy-generated comment has the format "Check out the PR @ <pull request url>",
@@ -111,22 +120,22 @@ func extractDataFromComment(comment string) (owner, repo string, number int, err
 	splitText := strings.Split(commentText, "@")
 	rawURL := splitText[1]
 	if len(rawURL) == 0 {
-		return "", "", 0, errors.New("No URL present or invalid format.")
+		return nil, errors.New("No URL present or invalid format.")
 	}
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
-		return "", "", 0, err
+		return nil, err
 	}
 	// url.Parse doesn't return an error for URLs like "0892734" or "lasd;asd", so we have to make
 	// sure the host was set.
 	if len(parsedURL.Host) == 0 {
-		return "", "", 0, errors.New("Invalid URL: " + rawURL)
+		return nil, errors.New("Invalid URL: " + rawURL)
 	}
 
 	splitPath := strings.Split(parsedURL.Path, "/")
 	// After splitting it, the resulting array is [" ", <organization>, <repo>, "pull", <issue no.>]
-	owner = splitPath[1]
-	repo = splitPath[2]
-	number, _ = strconv.Atoi(splitPath[4])
-	return owner, repo, number, nil
+	owner := splitPath[1]
+	repo := splitPath[2]
+	number, _ := strconv.Atoi(splitPath[4])
+	return &pullRequestData{owner, repo, number, parsedURL.Host}, nil
 }
