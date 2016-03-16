@@ -15,8 +15,11 @@ import (
 	ghservice "github.com/BaristaVentures/errand-boy/services/github"
 	"github.com/BaristaVentures/errand-boy/services/tracker"
 	"github.com/Sirupsen/logrus"
+	"github.com/deckarep/golang-set"
 	"github.com/gorilla/mux"
 )
+
+var supportedHighlights = mapset.NewSetFromSlice([]interface{}{"accepted", "rejected"})
 
 type pullRequestData struct {
 	Owner    string
@@ -46,19 +49,16 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&activity)
 
 	resource := activity.PrimaryResources[0]
-	if resource.Kind != "story" {
+	if resource.Kind != "story" || !supportedHighlights.Contains(activity.Highlight) {
 		// Not a story, so return.
 		w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	trackerProjectID := activity.Project.ID
-	trackerStoryID := resource.ID
-
 	apiToken := os.Getenv(config.Current().TrackerAPIToken)
 
 	trackerService := tracker.New(apiToken)
-	comments, err := trackerService.GetStoryComments(trackerProjectID, trackerStoryID)
+	comments, err := trackerService.GetStoryComments(activity.Project.ID, resource.ID)
 	if err != nil {
 		logrus.Error(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -68,7 +68,7 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		// Comment on story saying the story doesn't follow errand boy's conventions.
 		comment := `This story doesn't have any comment.
     Errand Boy relies on story comments to map them to their repository.`
-		trackerService.CommentOnStory(trackerProjectID, trackerStoryID, comment)
+		trackerService.CommentOnStory(activity.Project.ID, resource.ID, comment)
 		return
 	}
 
@@ -85,7 +85,7 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		visitedRepos[prData.RepoName] = true
 		projects := config.Current().Projects
 		for _, project := range projects {
-			if project.TrackerID == trackerProjectID {
+			if project.TrackerID == activity.Project.ID {
 				ghTokenEnvVar := project.Repos[prData.RepoName].Token
 				ghToken := os.Getenv(ghTokenEnvVar)
 				if len(ghToken) == 0 {
@@ -106,7 +106,7 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		// No comments were errand boy-compliant.
 		comment := `This story doesn't have any comment that matches Errand Boy's conventions.
     Errand Boy relies on story comments to map them to their repository.`
-		trackerService.CommentOnStory(trackerProjectID, trackerStoryID, comment)
+		trackerService.CommentOnStory(activity.Project.ID, resource.ID, comment)
 	}
 	w.WriteHeader(http.StatusOK)
 }
