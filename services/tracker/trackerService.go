@@ -3,7 +3,7 @@ package tracker
 import (
 	"errors"
 
-	"github.com/BaristaVentures/go-pivotaltracker/v5/pivotal"
+	"github.com/salsita/go-pivotaltracker/v5/pivotal"
 )
 
 // New returns a default TrackerService
