@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/BaristaVentures/errand-boy/services/logging"
 )
 
 func replaceRequestBody(payload PRConverter, r *http.Request) {
@@ -22,10 +24,12 @@ func NormalizePRPayload(next http.Handler) http.Handler {
 			// The request comes from GitHub.
 			prPayloadStruct := &gitHubPRPayload{}
 			replaceRequestBody(prPayloadStruct, r)
+			logging.Info(prPayloadStruct, "Received GitHub Pull Request Hook Payload:")
 		case len(r.Header.Get("X-Event-Key")) > 0:
 			// If the X-Event-Key header is set, It's bitbucket.
 			prPayloadStruct := &bitBucketPRPayload{}
 			replaceRequestBody(prPayloadStruct, r)
+			logging.Info(prPayloadStruct, "Received Bitbucket Pull Request Hook Payload:")
 		}
 		next.ServeHTTP(w, r)
 	})
