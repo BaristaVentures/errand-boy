@@ -2,9 +2,11 @@ package tracker
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 
@@ -29,21 +31,6 @@ func Route(router *mux.Router) *mux.Router {
 	}
 
 	return router
-}
-
-// GitHubPRURLData parses a pull request url and extracts its data.
-func GitHubPRURLData(rawURL string) (owner, repo string, number int, err error) {
-	parsedURL, err := url.Parse(rawURL)
-	if err != nil {
-		return owner, repo, number, err
-	}
-
-	splitPath := strings.Split(parsedURL.Path, "/")
-	// After splitting it, the resulting array is [" ", <organization>, <repo>, "pull", <issue no.>]
-	owner = splitPath[1]
-	repo = splitPath[2]
-	number, _ = strconv.Atoi(splitPath[4])
-	return owner, repo, number, nil
 }
 
 func activityHandler(w http.ResponseWriter, r *http.Request) {
@@ -76,18 +63,10 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 	visitedRepos := make(map[string]bool)
 
 	for _, comment := range comments {
-		commentText := strings.Replace(comment.Text, " ", "", -1)
-		// The errand boy-generated comment has the format "Check out the PR @ <pull request url>",
-		// so the url should be second in splitText.
-		splitText := strings.Split(commentText, "@")
-		if len(splitText) < 2 {
-			// Maybe it's a user comment, not necessarily a cause of error.
-			continue
-		}
 
-		owner, repoName, issueNo, err := GitHubPRURLData(splitText[1])
+		owner, repoName, issueNo, err := extractDataFromComment(comment.Text)
 		if err != nil || visitedRepos[repoName] {
-			// If the right side of the @ wasn't a URL (maybe it was a @mention or an email),
+			// If the right side of the @ wasn't a valid URL (maybe it was a @mention or an email),
 			// or if we already processed a repo with this name, continue.
 			continue
 		}
@@ -97,8 +76,14 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		projects := config.Current().Projects
 		for _, project := range projects {
 			if project.TrackerID == trackerProjectID {
-				ghToken := project.Repos[repoName].Token
-				comment := fmt.Sprintf("The [story](%s) related to this PR was %s", resource.URL, activity.Highlight)
+				ghTokenEnvVar := project.Repos[repoName].Token
+				ghToken := os.Getenv(ghTokenEnvVar)
+				if len(ghToken) == 0 {
+					// log "No value set for env var " + ghTokenEnvVar
+					break
+				}
+				fmtStr := "%s %s the [story](%s) related to this PR in Pivotal Tracker."
+				comment := fmt.Sprintf(fmtStr, activity.Actor.Name, activity.Highlight, resource.URL)
 				ghservice.New(ghToken).CommentOnIssue(owner, repoName, issueNo, comment)
 				break
 			}
@@ -110,4 +95,29 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		// Comment on story saying the story doesn't follow errand boy's conventions.
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+// GitHubPRURLData parses a pull request url and extracts its data.
+func extractDataFromComment(comment string) (owner, repo string, number int, err error) {
+	commentText := strings.Replace(comment, " ", "", -1)
+	// The errand boy-generated comment has the format "Check out the PR @ <pull request url>",
+	// so the url should be second in splitText.
+	splitText := strings.Split(commentText, "@")
+	rawURL := splitText[1]
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", "", 0, err
+	}
+	// url.Parse doesn't return an error for URLs like "0892734" or "lasd;asd", so we have to make
+	// sure the host was set.
+	if len(parsedURL.Host) == 0 {
+		return "", "", 0, errors.New("Invalid URL: " + rawURL)
+	}
+
+	splitPath := strings.Split(parsedURL.Path, "/")
+	// After splitting it, the resulting array is [" ", <organization>, <repo>, "pull", <issue no.>]
+	owner = splitPath[1]
+	repo = splitPath[2]
+	number, _ = strconv.Atoi(splitPath[4])
+	return owner, repo, number, nil
 }

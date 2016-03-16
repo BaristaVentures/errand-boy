@@ -1,4 +1,14 @@
 {
   "tracker_api_token": "PT_API_TOKEN",
-  "projects": []
+  "projects": [
+    {
+      "tracker_id": XXXXXX,
+      "repos": {
+        "errand-boy": {
+          "source": "github",
+          "token": "EB_GH_TOKEN"
+        }
+      }
+    }
+  ]
 }
