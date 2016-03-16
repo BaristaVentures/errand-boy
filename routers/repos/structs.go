@@ -77,27 +77,11 @@ func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
 }
 
 // GetContext implements logging.Logger
-func (bbPayload *bitBucketPRPayload) GetContext() logrus.Fields {
+func (pr *PullRequest) GetContext() logrus.Fields {
 	fields := logrus.Fields{
-		"state": bbPayload.PR.State,
-		"title": bbPayload.PR.Title,
-		"urls": logrus.Fields{
-			"html": logrus.Fields{
-				"href": bbPayload.PR.URLs.HTML.Href,
-			},
-		},
-	}
-	return fields
-}
-
-// GetContext implements logging.Logger
-func (ghPayload *gitHubPRPayload) GetContext() logrus.Fields {
-	fields := logrus.Fields{
-		"action": ghPayload.Action,
-		"pull request": logrus.Fields{
-			"title": ghPayload.PR.Title,
-			"url":   ghPayload.PR.HtmlURL,
-		},
+		"title":  pr.Title,
+		"status": pr.Status,
+		"url":    pr.URL,
 	}
 	return fields
 }
