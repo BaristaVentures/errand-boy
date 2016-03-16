@@ -2,10 +2,11 @@ package main
 
 import (
 	"flag"
+	"os"
+
 	"github.com/BaristaVentures/errand-boy/config"
 	"github.com/BaristaVentures/errand-boy/server"
 	log "github.com/Sirupsen/logrus"
-	"os"
 )
 
 func init() {

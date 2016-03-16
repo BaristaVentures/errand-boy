@@ -5,11 +5,14 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/BaristaVentures/errand-boy/services/logging"
 )
 
 func replaceRequestBody(payload PRConverter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&payload)
 	genPayload := payload.ToGenericPR()
+	logging.Info(genPayload, "Received Pull Request Hook Payload:")
 	genPayloadBytes, _ := json.Marshal(genPayload)
 	r.Body = ioutil.NopCloser(bytes.NewBuffer(genPayloadBytes))
 }
