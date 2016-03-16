@@ -10,15 +10,15 @@ func TestGitHubPRToGenericPR(t *testing.T) {
 	payload := &gitHubPRPayload{
 		Action: "opened",
 		PR: &gitHubPR{
-			Title: "I <3 PRS [PT 1401024 114991501]",
-			URL:   "https://google.com",
+			Title:   "I <3 PRS [PT 1401024 114991501]",
+			HtmlURL: "https://google.com",
 		},
 	}
 
 	genPayload := payload.ToGenericPR()
 	assert.Equals(t, payload.Action, genPayload.Status)
 	assert.Equals(t, payload.PR.Title, genPayload.Title)
-	assert.Equals(t, payload.PR.URL, genPayload.URL)
+	assert.Equals(t, payload.PR.HtmlURL, genPayload.URL)
 }
 
 func TestBitBucketPRToGenericPR(t *testing.T) {
