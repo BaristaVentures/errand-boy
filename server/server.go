@@ -8,9 +8,10 @@ import (
 
 	"github.com/BaristaVentures/errand-boy/config"
 	"github.com/BaristaVentures/errand-boy/routers/repos"
+	"github.com/BaristaVentures/errand-boy/routers/tracker"
 	// Importing it as a blank package causes its init method to be called.
 	"github.com/BaristaVentures/errand-boy/services/repotracker"
-	"github.com/BaristaVentures/errand-boy/services/tracker"
+	trackerservice "github.com/BaristaVentures/errand-boy/services/tracker"
 	"github.com/gorilla/mux"
 )
 
@@ -30,16 +31,24 @@ func (s *Server) BootUp() {
 	hooksSubRouter := hooksSubRoute.Subrouter()
 
 	reposSubRouter := hooksSubRouter.PathPrefix("/repos").Subrouter()
+	trackerSubRouter := hooksSubRouter.PathPrefix("/pt").Subrouter()
 
+	// Add the repos.NormalizePRPayload middleware.
 	baseRoute.Handler(repos.NormalizePRPayload(hooksSubRouter))
-
+	// Add the repos routes.
 	repos.Route(reposSubRouter)
+	//Add the tracker routes.
+	tracker.Route(trackerSubRouter)
 
-	apiToken := config.Current().TrackerAPIToken
-	if len(apiToken) == 0 {
-		panic(errors.New("Pivotal Tracker API Token not set in config file."))
+	apiTokenEnvVar := config.Current().TrackerAPIToken
+	if len(apiTokenEnvVar) == 0 {
+		panic(errors.New("Pivotal Tracker API Token Environment Variable name not set in config file."))
 	}
-	service := tracker.NewService(os.Getenv(apiToken))
+	trackerAPIToken := os.Getenv(apiTokenEnvVar)
+	if len(trackerAPIToken) == 0 {
+		panic(errors.New("No Pivotal Tracker API Token found in env var " + apiTokenEnvVar))
+	}
+	service := trackerservice.New(trackerAPIToken)
 	repotracker.SetTrackerService(service)
 
 	http.ListenAndServe(":"+strconv.Itoa(s.Port), r)

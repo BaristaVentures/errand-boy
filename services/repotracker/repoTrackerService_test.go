@@ -19,6 +19,10 @@ func (ms *goodMockService) CommentOnStory(projectID, storyID int, comment string
 	return &pivotal.Comment{}, nil
 }
 
+func (ms *goodMockService) GetStoryComments(projectID, storyID int) ([]*pivotal.Comment, error) {
+	return []*pivotal.Comment{}, nil
+}
+
 type badMockService struct{}
 
 func (ms *badMockService) SetStoryState(projectID, storyID int, state string) (*pivotal.Story, error) {
@@ -26,6 +30,10 @@ func (ms *badMockService) SetStoryState(projectID, storyID int, state string) (*
 }
 
 func (ms *badMockService) CommentOnStory(projectID, storyID int, comment string) (*pivotal.Comment, error) {
+	return nil, errors.New("")
+}
+
+func (ms *badMockService) GetStoryComments(projectID, storyID int) ([]*pivotal.Comment, error) {
 	return nil, errors.New("")
 }
 

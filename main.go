@@ -11,7 +11,8 @@ import (
 
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
-	// use this to use the json format and it help the integration with 3rd parties log.SetFormatter(&log.JSONFormatter{})
+	// use this to use the json format and it help the integration with 3rd parties
+	// log.SetFormatter(&log.JSONFormatter{})
 
 	// we can also add hooks to send info to papertrail
 	// package for papertrail hook https://github.com/polds/logrus-papertrail-hook

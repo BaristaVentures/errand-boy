@@ -1,6 +1,9 @@
 # errand-boy
 A service to integrate GitHub and Pivotal Tracker events to your project management workflow.
 
+# Why another Tracker - GitHub integration?
+TODO
+
 ## Run it
 Clone the repository and, in the root:
 ```sh
@@ -11,6 +14,7 @@ $ ./errand-boy [-p <port=8080>]
 ```
 
 ## Config file
+TODO: Needs revision.
 Errand Boy requires a configuration file to know what Pivotal Tracker projects map to which
 repositories.
 
@@ -26,30 +30,36 @@ Example:
   "projects": [
     {
       "tracker_id": 123581321,
-      "repos": [
-        {
+      "repos": {
+        "awesome-repo-1": {
           "source": "github",
-          "name": "awesome-repo-1",
           "token": "REPO_1_TOKEN_ENV_VAR"
         },
-        {
+        "awesome-repo-2":{
           "source": "github",
-          "name": "awesome-repo-2",
           "token": "REPO_2_TOKEN_ENV_VAR"
         }
-      ]
+      }
     }
   ]
 }
 ```
 
 ## Steps (TODO: add pics of the process)
-1. In your repository's settings, under "Webhooks & services", add a new webhook to the GitHub
+
+**GitHub side**:
+- In your repository's settings, under "Webhooks & services", add a new webhook to the GitHub
 repositories.
-2. Enter the URL where the hook's POST request will be sent.
-3. Select "Let me select individual events." and tick the Pull Request checkbox.
-4. Click on "Add webhook".
-5. Profit!
+- Enter `<your Errand Boy URL>[:<port>]/hooks/repos/pr`
+- Select "Let me select individual events." and tick the Pull Request checkbox.
+- Click on "Add webhook".
+
+**Pivotal Tracker side**
+
+- Go to your project's settings, and click on the "Integration" tab.
+- Under "Activity Webhook", enter `<your Errand Boy URL>[:<port>]/hooks/tracker/activity`.
+- Make sure "v5" is selected in the drop down.
+- Click on "ADD".
 
 ## Scripts
 

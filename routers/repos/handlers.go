@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-func pullRequestHandler(res http.ResponseWriter, req *http.Request) {
+func pullRequestHandler(w http.ResponseWriter, r *http.Request) {
 	var prPayload PullRequest
-	json.NewDecoder(req.Body).Decode(&prPayload)
+	json.NewDecoder(r.Body).Decode(&prPayload)
 	// // TODO: handle possible publisher errors.
 	_ = eventsSubs["pr"].Publish(prPayload)
-	res.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusOK)
 }
