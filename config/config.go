@@ -2,9 +2,10 @@ package config
 
 import (
 	"encoding/json"
-	log "github.com/Sirupsen/logrus"
 	"io/ioutil"
 	"os"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 var config *Config
@@ -23,8 +24,7 @@ type Project struct {
 
 // Repo represents a repository
 type Repo struct {
-	Source string `json:"source"`
-	Token  string `json:"token"`
+	Token string `json:"token"`
 }
 
 // Load  parses the config from a json file to a *Config and returns it.
