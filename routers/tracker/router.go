@@ -13,6 +13,7 @@ import (
 	"github.com/BaristaVentures/errand-boy/config"
 	"github.com/BaristaVentures/errand-boy/routers"
 	ghservice "github.com/BaristaVentures/errand-boy/services/github"
+	"github.com/BaristaVentures/errand-boy/services/logging"
 	"github.com/BaristaVentures/errand-boy/services/tracker"
 	"github.com/Sirupsen/logrus"
 	"github.com/deckarep/golang-set"
@@ -47,10 +48,12 @@ func Route(router *mux.Router) *mux.Router {
 func activityHandler(w http.ResponseWriter, r *http.Request) {
 	activity := &ActivityPayload{}
 	json.NewDecoder(r.Body).Decode(&activity)
+	logging.Info(activity, "Received new Pivotal Tracker activity:")
 
 	resource := activity.PrimaryResources[0]
 	if resource.Kind != "story" || !supportedHighlights.Contains(activity.Highlight) {
-		// Not a story, so return.
+		// Not a story, or not a supported story event, so return.
+		logging.Info(activity, "Activity not supported.")
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -89,7 +92,7 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 				ghTokenEnvVar := project.Repos[prData.RepoName].Token
 				ghToken := os.Getenv(ghTokenEnvVar)
 				if len(ghToken) == 0 {
-					logrus.Error("No value set for env var " + ghTokenEnvVar)
+					logrus.Errorf("No value set for env var %s, can't access GitHub API.", ghTokenEnvVar)
 					break
 				}
 				fmtStr := "%s %s the [story](%s) related to this PR in Pivotal Tracker."

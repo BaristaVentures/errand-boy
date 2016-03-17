@@ -47,14 +47,14 @@ Example:
 
 ## Steps (TODO: add pics of the process)
 
-**GitHub side**:
+**GitHub**:
 - In your repository's settings, under "Webhooks & services", add a new webhook to the GitHub
 repositories.
 - Enter `<your Errand Boy URL>[:<port>]/hooks/repos/pr`
 - Select "Let me select individual events." and tick the Pull Request checkbox.
 - Click on "Add webhook".
 
-**Pivotal Tracker side**
+**Pivotal Tracker**
 
 - Go to your project's settings, and click on the "Integration" tab.
 - Under "Activity Webhook", enter `<your Errand Boy URL>[:<port>]/hooks/tracker/activity`.

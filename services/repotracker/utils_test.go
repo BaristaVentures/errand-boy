@@ -1,31 +1,55 @@
 package repotracker
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/BaristaVentures/errand-boy/config"
+	"github.com/BaristaVentures/errand-boy/routers/repos"
 	"github.com/hooklift/assert"
 )
 
-func TestParseTrackerCodeOk(t *testing.T) {
-	projectID, storyID, err := parseTrackerCode("[PT 12321312 1234]")
+func TestGetTrackerData(t *testing.T) {
+	trackerID := 987654321
+	storyID := 123456
+	repoName := "awesome-repo"
+	conf := config.Current()
+	reposMap := make(map[string]*config.Repo)
+	reposMap[repoName] = &config.Repo{}
+	projects := []*config.Project{
+		&config.Project{
+			TrackerID: trackerID,
+			Repos:     reposMap,
+		},
+	}
+	conf.Projects = projects
+
+	pr := &repos.PullRequest{
+		Repo:  repoName,
+		Title: fmt.Sprintf("Awesome PR to solve everything [%d]", storyID),
+	}
+	parsedTrackerID, parsedStoryID, err := getTrackerData(pr)
 	assert.Ok(t, err)
-	assert.Equals(t, 12321312, projectID)
-	assert.Equals(t, 1234, storyID)
+	assert.Equals(t, trackerID, parsedTrackerID)
+	assert.Equals(t, storyID, parsedStoryID)
 }
 
-func TestParseTrackerCodeLong(t *testing.T) {
-	projectID, storyID, err := parseTrackerCode("Solve all the project's issues. [PT 123123 1234]")
-	assert.Ok(t, err)
-	assert.Equals(t, 123123, projectID)
-	assert.Equals(t, 1234, storyID)
+func TestGetTrackerDataNoCodeFormat(t *testing.T) {
+	pr := &repos.PullRequest{
+		Repo:  "a-repo",
+		Title: "Bad PR Title with no code format :(",
+	}
+	_, _, err := getTrackerData(pr)
+	assert.Cond(t, err != nil, "Err shouldn't be nil when no code format is present in the PR title.")
 }
 
-func TestParseTrackerCodeInvalid(t *testing.T) {
-	_, _, err := parseTrackerCode("[PT 13375p34k")
-	assert.Cond(t, err != nil, err.Error())
-}
-
-func TestParseTrackerCodeMissing(t *testing.T) {
-	_, _, err := parseTrackerCode("Nope.")
-	assert.Cond(t, err != nil, err.Error())
+func TestGetTrackerDataNoProjectConfig(t *testing.T) {
+	pr := &repos.PullRequest{
+		Repo:  "some-dudes-repo",
+		Title: "Awesome PR with a code in the title but with no matching config :'(' [1234]",
+	}
+	conf := config.Current()
+	conf.Projects = []*config.Project{}
+	_, _, err := getTrackerData(pr)
+	assert.Cond(t, err != nil, "Err shouldn't be nil when there's no matching config for that repo.")
 }

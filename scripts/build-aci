@@ -34,7 +34,9 @@ TMPHOSTS="$(mktemp)"
 trap "{ export EXT=$?; rm "$TMPHOSTS" && acbuild --debug end && exit $EXT; }" EXIT
 
 cat <<DF > $TMPHOSTS
-208.85.149.36 www.pivotaltracker.com
+208.85.149.36  www.pivotaltracker.com
+192.30.252.127 api.github.com
+192.30.252.128 www.github.com
 DF
 
 acbuild --debug set-name barista-v.com/errand-boy
