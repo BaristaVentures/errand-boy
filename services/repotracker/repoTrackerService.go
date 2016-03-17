@@ -23,9 +23,9 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 	prPayload := payload.(repos.PullRequest)
 	switch prPayload.Status {
 	case "opened":
-		projectID, storyID, err := parseTrackerCode(prPayload.Title)
+		projectID, storyID, err := getTrackerData(&prPayload)
 		if err != nil {
-			return errors.New("Invalid Pivotal Tracker Code")
+			return err
 		}
 		// Set the story as finished.
 		_, err = trackerService.SetStoryState(projectID, storyID, "finished")

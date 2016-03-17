@@ -8,7 +8,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-var config *Config
+var config = &Config{}
 
 // Config encapsulates Errand Boy's general config.
 type Config struct {
@@ -31,7 +31,7 @@ type Repo struct {
 func Load(path string) (*Config, error) {
 	log.WithFields(log.Fields{
 		"path": path,
-	}).Info("Reading errand boy config")
+	}).Info("Reading Errand Boy config")
 	reader, err := os.Open(path)
 
 	if err != nil {
@@ -44,7 +44,6 @@ func Load(path string) (*Config, error) {
 		return nil, err
 	}
 
-	config = &Config{}
 	json.Unmarshal(bytes, config)
 
 	return config, nil

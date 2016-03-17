@@ -16,6 +16,7 @@ type PRConverter interface {
 type PullRequest struct {
 	Title  string
 	Status string
+	Repo   string
 	URL    string
 }
 
@@ -26,13 +27,27 @@ type gitHubPRPayload struct {
 }
 
 type gitHubPR struct {
-	Title   string `json:"title"`
-	HtmlURL string `json:"html_url"`
+	Title   string     `json:"title"`
+	HtmlURL string     `json:"html_url"`
+	Base    *gitHubRef `json:"base"`
+}
+
+type gitHubRef struct {
+	Repo *gitHubRepo `json:"repo"`
+}
+
+type gitHubRepo struct {
+	Name string `json:"name"`
 }
 
 // bitBucketPRPayload represents the body of BitBucket's PR webhook.
 type bitBucketPRPayload struct {
-	PR *bitBucketPR `json:"pullrequest"`
+	PR   *bitBucketPR   `json:"pullrequest"`
+	Repo *bitBucketRepo `json:"repository"`
+}
+
+type bitBucketRepo struct {
+	Name string `json:"name"`
 }
 
 type bitBucketPR struct {
@@ -51,18 +66,16 @@ type bitBucketLink struct {
 
 // ToGenericPR transforms a GitHubPRPayload into a Generic one.
 func (ghPayload *gitHubPRPayload) ToGenericPR() *PullRequest {
-
 	genericPayload := &PullRequest{}
 	genericPayload.Status = ghPayload.Action
 	genericPayload.Title = ghPayload.PR.Title
 	genericPayload.URL = ghPayload.PR.HtmlURL
-
+	genericPayload.Repo = ghPayload.PR.Base.Repo.Name
 	return genericPayload
 }
 
 // ToGenericPR transforms a BitBucketPRPayload into a Generic one.
 func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
-
 	genericPayload := &PullRequest{}
 	// bbPayload.PR.State can be OPEN|MERGED|DECLINED
 	if bbPayload.PR.State == "OPEN" {
@@ -72,7 +85,7 @@ func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
 	}
 	genericPayload.Title = bbPayload.PR.Title
 	genericPayload.URL = bbPayload.PR.URLs.HTML.Href
-
+	genericPayload.Repo = bbPayload.Repo.Name
 	return genericPayload
 }
 
@@ -82,6 +95,7 @@ func (pr *PullRequest) GetContext() logrus.Fields {
 		"title":  pr.Title,
 		"status": pr.Status,
 		"url":    pr.URL,
+		"repo":   pr.Repo,
 	}
 	return fields
 }
