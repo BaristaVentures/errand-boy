@@ -5,24 +5,34 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/BaristaVentures/errand-boy/config"
+	"github.com/BaristaVentures/errand-boy/routers/repos"
 )
 
-// The PR title should contain something like [PT projectID storyID]
-var exp, _ = regexp.Compile("\\[PT\\s(\\d)+\\s(\\d)+\\]")
+// The PR title should contain something like [storyID]
+var exp, _ = regexp.Compile("\\[(\\d)+\\]")
 
-func parseTrackerCode(prTitle string) (int, int, error) {
-	codeSubStr := exp.FindString(prTitle)
+func getTrackerData(pr *repos.PullRequest) (projectID, storyID int, err error) {
+	codeSubStr := exp.FindString(pr.Title)
 	if len(codeSubStr) == 0 {
 		return 0, 0, errors.New("Code format wasn't present.")
 	}
-	codeParts := strings.Split(strings.Trim(codeSubStr, "[]"), " ")
-	if len(codeParts) != 3 {
-		return 0, 0, errors.New("Code format wasn't valid.")
+	// Error can be ignored because at this point, the regexp guarantees there's an int there.
+	storyID, _ = strconv.Atoi(strings.Trim(codeSubStr, "[]"))
+	projectID, ok := getProjectIDForRepo(pr.Repo)
+	if !ok {
+		return 0, 0, errors.New("No Project Tracker ID for repo " + pr.Repo + " in current config.")
 	}
-	projectID, err := strconv.Atoi(codeParts[1])
-	if err != nil {
-		return 0, 0, errors.New("Code wasn't numeric.")
+	return projectID, storyID, nil
+}
+
+func getProjectIDForRepo(repo string) (int, bool) {
+	projects := config.Current().Projects
+	for _, p := range projects {
+		if _, ok := p.Repos[repo]; ok {
+			return p.TrackerID, true
+		}
 	}
-	ID, err := strconv.Atoi(codeParts[2])
-	return projectID, ID, nil
+	return 0, false
 }
