@@ -24,7 +24,8 @@ type Project struct {
 
 // Repo represents a repository
 type Repo struct {
-	Token string `json:"token"`
+	Token   string   `json:"token"`
+	Scripts []string `json:"scripts"`
 }
 
 // Load  parses the config from a json file to a *Config and returns it.
@@ -33,7 +34,6 @@ func Load(path string) (*Config, error) {
 		"path": path,
 	}).Info("Reading Errand Boy config")
 	reader, err := os.Open(path)
-
 	if err != nil {
 		return nil, err
 	}

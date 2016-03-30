@@ -11,7 +11,12 @@ func TestGitHubPRToGenericPR(t *testing.T) {
 		Action: "opened",
 		PR: &gitHubPR{
 			Title:   "I <3 PRS [PT 1401024 114991501]",
-			HtmlURL: "https://google.com",
+			HtmlURL: "https://github.com/BaristaVentures/errand-boy/pull/9",
+			Base: &gitHubRef{
+				Repo: &gitHubRepo{
+					Name: "lib-awesome",
+				},
+			},
 		},
 	}
 
@@ -31,6 +36,9 @@ func TestBitBucketPRToGenericPR(t *testing.T) {
 					Href: "http://barista-v.com",
 				},
 			},
+		},
+		Repo: &bitBucketRepo{
+			Name: "lib-awesome",
 		},
 	}
 

@@ -16,7 +16,6 @@ func TestLoadConfig(t *testing.T) {
 	trackerAPIToken := "asb1234basdasd"
 	trackerProjectID := 123581321
 	repoName := "awesome-repo-1"
-	repoSource := "github"
 	repoToken := "asdsad23edadsd1234812"
 	configContentFmt := `{
     "tracker_api_token": "%s",
@@ -25,7 +24,6 @@ func TestLoadConfig(t *testing.T) {
         "tracker_id": %d,
         "repos": {
           "%s": {
-            "source": "%s",
             "token": "%s"
           }
         }
@@ -38,7 +36,6 @@ func TestLoadConfig(t *testing.T) {
 		trackerAPIToken,
 		trackerProjectID,
 		repoName,
-		repoSource,
 		repoToken,
 	)
 
@@ -58,7 +55,6 @@ func TestLoadConfig(t *testing.T) {
 	project := config.Projects[0]
 	assert.Equals(t, trackerProjectID, project.TrackerID)
 	repo := project.Repos[repoName]
-	assert.Equals(t, repoSource, repo.Source)
 	assert.Equals(t, repoToken, repo.Token)
 }
 

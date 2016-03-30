@@ -24,20 +24,17 @@ Errand Boy can access.
 
 Example:
 
-```json
+```js
 {
-  "tracker_api_token": "PT_API_TOKEN_ENV_VAR",
+  "tracker_api_token": "PT_API_TOKEN",
   "projects": [
     {
-      "tracker_id": 123581321,
+      "tracker_id": 1401024,
       "repos": {
-        "awesome-repo-1": {
-          "source": "github",
-          "token": "REPO_1_TOKEN_ENV_VAR"
-        },
-        "awesome-repo-2":{
-          "source": "github",
-          "token": "REPO_2_TOKEN_ENV_VAR"
+        "null-framework": {
+          "token": "EB_GH_TOKEN",
+          // Scripts to be executed when a branch is merged.
+          "scripts": ["go build"]
         }
       }
     }
