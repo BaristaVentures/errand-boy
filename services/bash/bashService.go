@@ -41,22 +41,26 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 			return err
 		}
 
-		for name, repo := range project.Repos {
-			for i, script := range repo.Scripts {
-				logrus.Infof(
-					"Running \"%s\" (%d/%d) for repo %s of project %d",
-					script,
-					i+1,
-					len(repo.Scripts), name, projectID,
-				)
-				splitScript := strings.Split(script, " ")
-				output, err := Run(splitScript[0], splitScript[1:]...)
-				if err != nil {
-					logrus.Error(err)
-				} else {
-					logrus.Info(string(output))
+		for n, r := range project.Repos {
+			name := n
+			repo := r
+			go func() {
+				for i, script := range repo.Scripts {
+					logrus.Infof(
+						"Running \"%s\" (%d/%d) for repo %s of project %d",
+						script,
+						i+1,
+						len(repo.Scripts), name, projectID,
+					)
+					splitScript := strings.Split(script, " ")
+					output, err := Run(splitScript[0], splitScript[1:]...)
+					if err != nil {
+						logrus.Error(err)
+					} else {
+						logrus.Info(string(output))
+					}
 				}
-			}
+			}()
 		}
 	}
 	return nil
