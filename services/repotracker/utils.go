@@ -13,7 +13,7 @@ import (
 // The PR title should contain something like [storyID]
 var exp, _ = regexp.Compile("\\[(\\d)+\\]")
 
-func getTrackerData(pr *repos.PullRequest) (projectID, storyID int, err error) {
+func GetTrackerData(pr *repos.PullRequest) (projectID, storyID int, err error) {
 	codeSubStr := exp.FindString(pr.Title)
 	if len(codeSubStr) == 0 {
 		return 0, 0, errors.New("Code format wasn't present.")
@@ -28,7 +28,11 @@ func getTrackerData(pr *repos.PullRequest) (projectID, storyID int, err error) {
 }
 
 func getProjectIDForRepo(repo string) (int, bool) {
-	projects := config.Current().Projects
+	curConfig, err := config.Current()
+	if err != nil {
+		return 0, false
+	}
+	projects := curConfig.Projects
 	for _, p := range projects {
 		if _, ok := p.Repos[repo]; ok {
 			return p.TrackerID, true

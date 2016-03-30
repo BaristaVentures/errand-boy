@@ -2,13 +2,15 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 
 	log "github.com/Sirupsen/logrus"
 )
 
-var config = &Config{}
+var config *Config
 
 // Config encapsulates Errand Boy's general config.
 type Config struct {
@@ -28,8 +30,22 @@ type Repo struct {
 	Scripts []string `json:"scripts"`
 }
 
+// GetProject returns a project if it matches
+func (conf *Config) GetProject(trackerID int) (*Project, error) {
+	if config == nil {
+		return nil, errors.New("No loaded configuration.")
+	}
+	for _, p := range config.Projects {
+		if p.TrackerID == trackerID {
+			return p, nil
+		}
+	}
+	return nil, fmt.Errorf("No project found with TrackerID: %d", trackerID)
+}
+
 // Load  parses the config from a json file to a *Config and returns it.
 func Load(path string) (*Config, error) {
+	config = &Config{}
 	log.WithFields(log.Fields{
 		"path": path,
 	}).Info("Reading Errand Boy config")
@@ -45,13 +61,15 @@ func Load(path string) (*Config, error) {
 	}
 
 	json.Unmarshal(bytes, config)
-
 	return config, nil
 }
 
 // Current returns the current config.
-func Current() *Config {
+func Current() (*Config, error) {
 	// TODO: Maybe we should check the last time the config file was "touched", compare it with
 	// errand boy's start time. If it was modified after, reload the config.
-	return config
+	if config == nil {
+		return nil, errors.New("No loaded configuration.")
+	}
+	return config, nil
 }

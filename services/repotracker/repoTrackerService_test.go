@@ -41,7 +41,8 @@ func (ms *badMockService) GetStoryComments(projectID, storyID int) ([]*pivotal.C
 func TestPRHandler(t *testing.T) {
 	trackerID := 987654321
 	repoName := "awesome-repo"
-	conf := config.Current()
+	curConfig, err := config.Current()
+	assert.Ok(t, err)
 	reposMap := make(map[string]*config.Repo)
 	reposMap[repoName] = &config.Repo{}
 	projects := []*config.Project{
@@ -50,7 +51,7 @@ func TestPRHandler(t *testing.T) {
 			Repos:     reposMap,
 		},
 	}
-	conf.Projects = projects
+	curConfig.Projects = projects
 
 	SetTrackerService(&goodMockService{})
 	prMock := &repos.PullRequest{
@@ -59,7 +60,7 @@ func TestPRHandler(t *testing.T) {
 		Status: "opened",
 		Repo:   repoName,
 	}
-	err := pullRequestHandler(*prMock)
+	err = pullRequestHandler(*prMock)
 	assert.Ok(t, err)
 }
 

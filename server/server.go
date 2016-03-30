@@ -10,6 +10,7 @@ import (
 	"github.com/BaristaVentures/errand-boy/routers/repos"
 	"github.com/BaristaVentures/errand-boy/routers/tracker"
 	// Importing it as a blank package causes its init method to be called.
+	_ "github.com/BaristaVentures/errand-boy/services/bash"
 	"github.com/BaristaVentures/errand-boy/services/repotracker"
 	trackerservice "github.com/BaristaVentures/errand-boy/services/tracker"
 	"github.com/gorilla/mux"
@@ -40,7 +41,11 @@ func (s *Server) BootUp() {
 	//Add the tracker routes.
 	tracker.Route(trackerSubRouter)
 
-	apiTokenEnvVar := config.Current().TrackerAPIToken
+	curConfig, err := config.Current()
+	if err != nil {
+		panic(err)
+	}
+	apiTokenEnvVar := curConfig.TrackerAPIToken
 	if len(apiTokenEnvVar) == 0 {
 		panic(errors.New("Pivotal Tracker API Token Environment Variable name not set in config file."))
 	}
