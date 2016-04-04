@@ -15,6 +15,7 @@ $ ./errand-boy [-p <port=8080>]
 
 ## Config file
 TODO: Needs revision.
+
 Errand Boy requires a configuration file to know what Pivotal Tracker projects map to which
 repositories.
 
@@ -57,7 +58,6 @@ repositories.
 - Click on "Add webhook".
 
 **Pivotal Tracker**
-
 - Go to your project's settings, and click on the "Integration" tab.
 - Under "Activity Webhook", enter `<your Errand Boy URL>[:<port>]/hooks/tracker/activity`.
 - Make sure "v5" is selected in the drop down.
