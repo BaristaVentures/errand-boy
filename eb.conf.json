@@ -2,46 +2,10 @@
   "tracker_api_token": "PT_API_TOKEN",
   "projects": [
     {
-      "tracker_id": 1401024,
-      "repos": {
-        "null-framework": {
-          "token": "EB_GH_TOKEN",
-          "host": "localhost",
-          "port": 8080,
-          "commands": [
-            "echo PAPAYA"
-          ]
-        }
-      }
-    },
-    {
-      "tracker_id": 1551821,
+      "tracker_id": XXXXXX,
       "repos": {
         "errand-boy": {
-          "token": "EB_GH_TOKEN"
-        }
-      }
-    },
-    {
-      "tracker_id": 1551829,
-      "repos": {
-        "idonethat": {
-          "token": "EB_GH_TOKEN"
-        }
-      }
-    },
-    {
-      "tracker_id": 1368848,
-      "repos": {
-        "wapa": {
-          "token": "EB_GH_TOKEN"
-        }
-      }
-    },
-    {
-      "tracker_id": 1410942,
-      "repos": {
-        "pickup_orders": {
+          "source": "github",
           "token": "EB_GH_TOKEN"
         }
       }

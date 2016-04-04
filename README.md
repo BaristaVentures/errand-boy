@@ -23,9 +23,12 @@ repositories.
 `tracker_api_token` and each repository `token` value should be names of  environment variables that
 Errand Boy can access.
 
-For scripts that use `ssh`, you need to add you public key to the other host's
+To use `ssh`, you need to add you public key to the other host's
 **.ssh/authorized_keys** file. [This guide](http://linuxproblem.org/art_9.html) explains it rather
 simply.
+
+For commands that `git clone` private repositories, it's probably a good idea to add your server's
+public key to your github account, so that no password is needed to clone the repository.
 
 File example:
 
