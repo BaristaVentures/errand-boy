@@ -2,10 +2,10 @@
 
 set -e
 
-if [ "$EUID" -ne 0 ]; then
-    echo "This script uses functionality which requires root privileges"
-    exit 1
-fi
+# if [ "$EUID" -ne 0 ]; then
+#     echo "This script uses functionality which requires root privileges"
+#     exit 1
+# fi
 
 BINARYDIR=${BINARYDIR:-bin}
 BUILDDIR=${BUILDDIR:-bin}

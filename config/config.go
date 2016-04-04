@@ -26,8 +26,10 @@ type Project struct {
 
 // Repo represents a repository
 type Repo struct {
-	Token   string   `json:"token"`
-	Scripts []string `json:"scripts"`
+	Token    string   `json:"token"`
+	Host     string   `json:"host"`
+	Port     int      `json:"port"`
+	Commands []string `json:"commands"`
 }
 
 // GetProject returns a project if it matches

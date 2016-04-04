@@ -2,10 +2,13 @@ package repotracker
 
 import (
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/BaristaVentures/errand-boy/config"
 	"github.com/BaristaVentures/errand-boy/routers/repos"
+	"github.com/BaristaVentures/errand-boy/testutil"
+	"github.com/Sirupsen/logrus"
 	"github.com/hooklift/assert"
 	"github.com/salsita/go-pivotaltracker/v5/pivotal"
 )
@@ -39,10 +42,10 @@ func (ms *badMockService) GetStoryComments(projectID, storyID int) ([]*pivotal.C
 }
 
 func TestPRHandler(t *testing.T) {
+	logrus.SetLevel(logrus.PanicLevel)
 	trackerID := 987654321
 	repoName := "awesome-repo"
-	curConfig, err := config.Current()
-	assert.Ok(t, err)
+	conf := &config.Config{}
 	reposMap := make(map[string]*config.Repo)
 	reposMap[repoName] = &config.Repo{}
 	projects := []*config.Project{
@@ -51,7 +54,14 @@ func TestPRHandler(t *testing.T) {
 			Repos:     reposMap,
 		},
 	}
-	curConfig.Projects = projects
+	conf.Projects = projects
+	configPath := "./test_eb-config.json"
+	err := testutil.CreateConfigFile(conf, configPath)
+	defer os.Remove(configPath)
+	assert.Ok(t, err)
+
+	_, err = config.Load(configPath)
+	assert.Ok(t, err)
 
 	SetTrackerService(&goodMockService{})
 	prMock := &repos.PullRequest{

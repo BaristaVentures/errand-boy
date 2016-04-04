@@ -22,7 +22,11 @@ repositories.
 `tracker_api_token` and each repository `token` value should be names of  environment variables that
 Errand Boy can access.
 
-Example:
+For scripts that use `ssh`, you need to add you public key to the other host's
+**.ssh/authorized_keys** file. [This guide](http://linuxproblem.org/art_9.html) explains it rather
+simply.
+
+File example:
 
 ```js
 {
@@ -33,8 +37,9 @@ Example:
       "repos": {
         "null-framework": {
           "token": "EB_GH_TOKEN",
-          // Scripts to be executed when a branch is merged.
-          "scripts": ["go build"]
+          "host": "some.host.com",
+          "port": 8080
+          "commands": ["go build", "./awesome-repo"]
         }
       }
     }

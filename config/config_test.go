@@ -10,7 +10,6 @@ import (
 )
 
 func createConfigFile(conf *Config, configPath string) error {
-
 	configBytes, err := json.Marshal(conf)
 	if err != nil {
 		return err
