@@ -22,7 +22,7 @@ func createCommandsFile(repoName string, repo *config.Repo, filepath string) err
 	if len(repo.Commands) == 0 {
 		return errors.New("No deploy scripts for repo \"" + repoName + "\"")
 	}
-	file, err := os.Create(filepath)
+	file, err := os.OpenFile(filepath, os.O_CREATE|os.O_RDWR, 777)
 	if err != nil {
 		return err
 	}
@@ -33,20 +33,6 @@ func createCommandsFile(repoName string, repo *config.Repo, filepath string) err
 			os.Remove(filepath)
 			return err
 		}
-	}
-	if err = file.Close(); err != nil {
-		os.Remove(filepath)
-		return err
-	}
-	// Make it executable
-	file, err = os.Open(filepath)
-	if err != nil {
-		os.Remove(filepath)
-		return err
-	}
-	if err = file.Chmod(777); err != nil {
-		os.Remove(filepath)
-		return err
 	}
 	if err = file.Close(); err != nil {
 		os.Remove(filepath)
