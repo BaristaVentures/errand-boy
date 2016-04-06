@@ -15,6 +15,7 @@ $ ./errand-boy [-p <port=8080>]
 
 ## Config file
 TODO: Needs revision.
+
 Errand Boy requires a configuration file to know what Pivotal Tracker projects map to which
 repositories.
 
@@ -22,22 +23,27 @@ repositories.
 `tracker_api_token` and each repository `token` value should be names of  environment variables that
 Errand Boy can access.
 
-Example:
+To use `ssh`, you need to add you public key to the other host's
+**.ssh/authorized_keys** file. [This guide](http://linuxproblem.org/art_9.html) explains it rather
+simply.
 
-```json
+For commands that `git clone` private repositories, it's probably a good idea to add your server's
+public key to your github account, so that no password is needed to clone the repository.
+
+File example:
+
+```js
 {
-  "tracker_api_token": "PT_API_TOKEN_ENV_VAR",
+  "tracker_api_token": "PT_API_TOKEN",
   "projects": [
     {
-      "tracker_id": 123581321,
+      "tracker_id": 1401024,
       "repos": {
-        "awesome-repo-1": {
-          "source": "github",
-          "token": "REPO_1_TOKEN_ENV_VAR"
-        },
-        "awesome-repo-2":{
-          "source": "github",
-          "token": "REPO_2_TOKEN_ENV_VAR"
+        "null-framework": {
+          "token": "EB_GH_TOKEN",
+          "host": "some.host.com",
+          "port": 8080
+          "commands": ["go build", "./awesome-repo"]
         }
       }
     }
@@ -55,7 +61,6 @@ repositories.
 - Click on "Add webhook".
 
 **Pivotal Tracker**
-
 - Go to your project's settings, and click on the "Integration" tab.
 - Under "Activity Webhook", enter `<your Errand Boy URL>[:<port>]/hooks/tracker/activity`.
 - Make sure "v5" is selected in the drop down.

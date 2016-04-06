@@ -25,7 +25,7 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 	case "reopened":
 		fallthrough
 	case "opened":
-		projectID, storyID, err := getTrackerData(&prPayload)
+		projectID, storyID, err := GetTrackerData(&prPayload)
 		logrus.Info(projectID, storyID)
 		if err != nil {
 			logrus.Error(err)
