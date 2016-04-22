@@ -33,6 +33,9 @@ func main() {
 	)
 	flag.Parse()
 
+	log.WithFields(log.Fields{
+		"path": *configFilePath,
+	}).Info("Reading Errand Boy config")
 	_, err := config.Load(*configFilePath)
 	if err != nil {
 		panic(err)
