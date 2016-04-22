@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-
-	log "github.com/Sirupsen/logrus"
 )
 
 var config *Config
@@ -48,9 +46,6 @@ func (conf *Config) GetProject(trackerID int) (*Project, error) {
 // Load  parses the config from a json file to a *Config and returns it.
 func Load(path string) (*Config, error) {
 	config = &Config{}
-	log.WithFields(log.Fields{
-		"path": path,
-	}).Info("Reading Errand Boy config")
 	reader, err := os.Open(path)
 	if err != nil {
 		return nil, err
