@@ -28,6 +28,7 @@ type Repo struct {
 	Host     string   `json:"host"`
 	Port     int      `json:"port"`
 	Commands []string `json:"commands"`
+	Hook     string   `json:"hook"`
 }
 
 // GetProject returns a project if it matches

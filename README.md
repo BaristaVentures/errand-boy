@@ -43,7 +43,8 @@ File example:
           "token": "EB_GH_TOKEN",
           "host": "some.host.com",
           "port": 8080
-          "commands": ["go build", "./awesome-repo"]
+          "commands": ["go build", "./awesome-repo"],
+          "hook": "jenkins.company.com"
         }
       }
     }

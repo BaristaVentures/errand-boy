@@ -50,10 +50,10 @@ func TestLoadConfig(t *testing.T) {
 	assert.Ok(t, err)
 	defer os.Remove(configPath)
 
-	config, err := Load(configPath)
+	loadedConf, err := Load(configPath)
 	assert.Ok(t, err)
 
-	assert.Equals(t, trackerAPIToken, config.TrackerAPIToken)
+	assert.Equals(t, trackerAPIToken, loadedConf.TrackerAPIToken)
 	assert.Equals(t, 1, len(config.Projects))
 	project := config.Projects[0]
 	assert.Equals(t, trackerProjectID, project.TrackerID)
