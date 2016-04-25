@@ -7,12 +7,11 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/hooklift/assert"
 )
 
 func TestReplaceRequestBody(t *testing.T) {
-	logrus.SetLevel(logrus.ErrorLevel)
 	ghPayload := &gitHubPRPayload{
 		Action: "opened",
 		PR: &gitHubPR{
@@ -27,12 +26,17 @@ func TestReplaceRequestBody(t *testing.T) {
 	}
 	ghPayloadBytes, err := json.Marshal(ghPayload)
 	assert.Ok(t, err)
-	r, err := http.NewRequest("POST", "what/ever", ioutil.NopCloser(bytes.NewBuffer(ghPayloadBytes)))
+	r, err := http.NewRequest("POST", "http://what.ever", bytes.NewReader(ghPayloadBytes))
 	assert.Ok(t, err)
-	genericPayloadBytes, err := json.Marshal(ghPayload.ToGenericPR())
+
+	genPayload := new(PullRequest)
+	genPayload.HydrateFromGitHub(*r)
+
+	genericPayloadBytes, err := json.Marshal(genPayload)
 	assert.Ok(t, err)
-	replaceRequestBody(ghPayload, r)
+	replaceRequestBody(genPayload, r)
 	body, err := ioutil.ReadAll(r.Body)
 	assert.Ok(t, err)
+	spew.Dump(body)
 	assert.Equals(t, genericPayloadBytes, body)
 }

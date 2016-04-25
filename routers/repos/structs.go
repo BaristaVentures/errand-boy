@@ -1,23 +1,22 @@
 package repos
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
 	"strings"
 
 	"github.com/Sirupsen/logrus"
 )
 
-// PRConverter identifies service-specific Pull Request payloads (like GitHub's and BitBucket's),
-// that can be converted into a generic PullRequest.
-type PRConverter interface {
-	ToGenericPR() *PullRequest
-}
-
 // PullRequest represents generic Pull Request info.
 type PullRequest struct {
-	Title  string
-	Status string
-	Repo   string
-	URL    string
+	OriginalBody []byte
+	Headers      http.Header
+	Title        string
+	Status       string
+	Repo         string
+	URL          string
 }
 
 // gitHubPRPayload represents the body of github's PR webhook.
@@ -64,29 +63,43 @@ type bitBucketLink struct {
 	Href string `json:"href"`
 }
 
-// ToGenericPR transforms a GitHubPRPayload into a Generic one.
-func (ghPayload *gitHubPRPayload) ToGenericPR() *PullRequest {
-	genericPayload := &PullRequest{}
-	genericPayload.Status = ghPayload.Action
-	genericPayload.Title = ghPayload.PR.Title
-	genericPayload.URL = ghPayload.PR.HtmlURL
-	genericPayload.Repo = ghPayload.PR.Base.Repo.Name
-	return genericPayload
-}
-
-// ToGenericPR transforms a BitBucketPRPayload into a Generic one.
-func (bbPayload *bitBucketPRPayload) ToGenericPR() *PullRequest {
-	genericPayload := &PullRequest{}
+// HydrateFromBitBucket hydrates a *PullRequest from a BitBucket Request.
+func (pr *PullRequest) HydrateFromBitBucket(r http.Request) error {
+	bbPayload := new(bitBucketPRPayload)
+	json.NewDecoder(r.Body).Decode(&bbPayload)
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	pr.OriginalBody = body
+	pr.Headers = r.Header
 	// bbPayload.PR.State can be OPEN|MERGED|DECLINED
 	if bbPayload.PR.State == "OPEN" {
-		genericPayload.Status = "opened"
+		pr.Status = "opened"
 	} else {
-		genericPayload.Status = strings.ToLower(bbPayload.PR.State)
+		pr.Status = strings.ToLower(bbPayload.PR.State)
 	}
-	genericPayload.Title = bbPayload.PR.Title
-	genericPayload.URL = bbPayload.PR.URLs.HTML.Href
-	genericPayload.Repo = bbPayload.Repo.Name
-	return genericPayload
+	pr.Title = bbPayload.PR.Title
+	pr.URL = bbPayload.PR.URLs.HTML.Href
+	pr.Repo = bbPayload.Repo.Name
+	return nil
+}
+
+// HydrateFromGitHub hydrates a *PullRequest from a GitHub Request.
+func (pr *PullRequest) HydrateFromGitHub(r http.Request) error {
+	ghPayload := new(gitHubPRPayload)
+	json.NewDecoder(r.Body).Decode(&ghPayload)
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	pr.OriginalBody = body
+	pr.Headers = r.Header
+	pr.Status = ghPayload.Action
+	pr.Title = ghPayload.PR.Title
+	pr.URL = ghPayload.PR.HtmlURL
+	pr.Repo = ghPayload.PR.Base.Repo.Name
+	return nil
 }
 
 // GetContext implements logging.Logger
