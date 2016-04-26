@@ -3,6 +3,7 @@ package webhook
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/BaristaVentures/errand-boy/config"
@@ -27,38 +28,49 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 			logrus.Error(err)
 			return err
 		}
-		conf, err := config.Current()
-		if err != nil {
-			logrus.Error(err)
-			return err
-		}
-		project, err := conf.GetProject(projectID)
-		if err != nil {
-			logrus.Error(err)
-			return err
-		}
-		hookURL := ""
-		for name, repo := range project.Repos {
-			if name == prPayload.Title {
-				hookURL = repo.Hook
-			}
-		}
+		hookURL, err := getHookForRepo(projectID, prPayload.Title)
 		if len(hookURL) == 0 {
-			err = errors.New("No webhook url specified for repo " + prPayload.Title)
+			if err == nil {
+				err = errors.New("No webhook url specified for repo " + prPayload.Title)
+			}
 			logrus.Error(err)
 			return err
 		}
-		req, err := http.NewRequest(http.MethodPost, hookURL, bytes.NewReader(prPayload.OriginalBody))
+		err = postRequest(hookURL, prPayload.OriginalBody, prPayload.Headers)
 		if err != nil {
-			logrus.Error(err)
-			return err
-		}
-		req.Header = prPayload.Headers
-		res, err := new(http.Client).Do(req)
-		if err != nil || res.StatusCode != http.StatusOK {
 			logrus.Error(err)
 			return err
 		}
 	}
 	return nil
+}
+
+func postRequest(hookURL string, body []byte, headers http.Header) error {
+	req, err := http.NewRequest(http.MethodPost, hookURL, bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header = headers
+	res, err := new(http.Client).Do(req)
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("Server returned with status code %d", res.StatusCode)
+	}
+	return err
+}
+
+func getHookForRepo(projectID int, repoTitle string) (string, error) {
+	conf, err := config.Current()
+	if err != nil {
+		return "", err
+	}
+	project, err := conf.GetProject(projectID)
+	if err != nil {
+		return "", err
+	}
+	for name, repo := range project.Repos {
+		if name == repoTitle {
+			return repo.Hook, nil
+		}
+	}
+	return "", nil
 }
