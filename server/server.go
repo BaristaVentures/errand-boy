@@ -41,11 +41,11 @@ func (s *Server) BootUp() {
 	//Add the tracker routes.
 	tracker.Route(trackerSubRouter)
 
-	curConfig, err := config.Current()
+	currentConfig, err := config.Current()
 	if err != nil {
 		panic(err)
 	}
-	apiTokenEnvVar := curConfig.TrackerAPIToken
+	apiTokenEnvVar := currentConfig.TrackerAPIToken
 	if len(apiTokenEnvVar) == 0 {
 		panic(errors.New("Pivotal Tracker API Token Environment Variable name not set in config file."))
 	}

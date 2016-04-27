@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-var config *Config
+var conf *Config
 
 // Config encapsulates Errand Boy's general config.
 type Config struct {
@@ -28,14 +28,15 @@ type Repo struct {
 	Host     string   `json:"host"`
 	Port     int      `json:"port"`
 	Commands []string `json:"commands"`
+	Hook     string   `json:"hook"`
 }
 
 // GetProject returns a project if it matches
 func (conf *Config) GetProject(trackerID int) (*Project, error) {
-	if config == nil {
+	if conf == nil {
 		return nil, errors.New("No loaded configuration.")
 	}
-	for _, p := range config.Projects {
+	for _, p := range conf.Projects {
 		if p.TrackerID == trackerID {
 			return p, nil
 		}
@@ -45,7 +46,7 @@ func (conf *Config) GetProject(trackerID int) (*Project, error) {
 
 // Load  parses the config from a json file to a *Config and returns it.
 func Load(path string) (*Config, error) {
-	config = &Config{}
+	conf = &Config{}
 	reader, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -57,16 +58,16 @@ func Load(path string) (*Config, error) {
 		return nil, err
 	}
 
-	json.Unmarshal(bytes, config)
-	return config, nil
+	json.Unmarshal(bytes, conf)
+	return conf, nil
 }
 
 // Current returns the current config.
 func Current() (*Config, error) {
 	// TODO: Maybe we should check the last time the config file was "touched", compare it with
 	// errand boy's start time. If it was modified after, reload the config.
-	if config == nil {
+	if conf == nil {
 		return nil, errors.New("No loaded configuration.")
 	}
-	return config, nil
+	return conf, nil
 }

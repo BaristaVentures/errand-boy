@@ -57,13 +57,13 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	curConfig, err := config.Current()
+	currentConfig, err := config.Current()
 	if err != nil {
 		logrus.Error(err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	apiToken := os.Getenv(curConfig.TrackerAPIToken)
+	apiToken := os.Getenv(currentConfig.TrackerAPIToken)
 
 	trackerService := tracker.New(apiToken)
 	comments, err := trackerService.GetStoryComments(activity.Project.ID, resource.ID)
@@ -91,7 +91,7 @@ func activityHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		visitedRepos[prData.RepoName] = true
-		projects := curConfig.Projects
+		projects := currentConfig.Projects
 		for _, project := range projects {
 			if project.TrackerID == activity.Project.ID {
 				ghTokenEnvVar := project.Repos[prData.RepoName].Token

@@ -45,7 +45,7 @@ func TestPRHandler(t *testing.T) {
 	logrus.SetLevel(logrus.PanicLevel)
 	trackerID := 987654321
 	repoName := "awesome-repo"
-	conf := &config.Config{}
+	mockConfig := &config.Config{}
 	reposMap := make(map[string]*config.Repo)
 	reposMap[repoName] = &config.Repo{}
 	projects := []*config.Project{
@@ -54,13 +54,13 @@ func TestPRHandler(t *testing.T) {
 			Repos:     reposMap,
 		},
 	}
-	conf.Projects = projects
-	configPath := "./test_eb-config.json"
-	err := testutil.CreateConfigFile(conf, configPath)
-	defer os.Remove(configPath)
+	mockConfig.Projects = projects
+	configFilePath := "./test_eb-config.json"
+	err := testutil.CreateConfigFile(mockConfig, configFilePath)
+	defer os.Remove(configFilePath)
 	assert.Ok(t, err)
 
-	_, err = config.Load(configPath)
+	_, err = config.Load(configFilePath)
 	assert.Ok(t, err)
 
 	SetTrackerService(&goodMockService{})
