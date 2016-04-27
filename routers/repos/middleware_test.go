@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/hooklift/assert"
 )
 
@@ -41,6 +40,5 @@ func TestReplaceRequestBody(t *testing.T) {
 	// Check that the body was actually replaced.
 	body, err := ioutil.ReadAll(r.Body)
 	assert.Ok(t, err)
-	spew.Dump(body)
 	assert.Equals(t, genericPayloadBytes, body)
 }
