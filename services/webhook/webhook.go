@@ -46,7 +46,7 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 }
 
 func postRequest(hookURL string, body []byte, headers http.Header) error {
-	req, err := http.NewRequest(http.MethodPost, hookURL, bytes.NewReader(body))
+	req, err := http.NewRequest("POST", hookURL, bytes.NewReader(body))
 	if err != nil {
 		return err
 	}
