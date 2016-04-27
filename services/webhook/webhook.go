@@ -28,10 +28,10 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 			logrus.Error(err)
 			return err
 		}
-		hookURL, err := getHookForRepo(projectID, prPayload.Title)
+		hookURL, err := getHookForRepo(projectID, prPayload.Repo)
 		if len(hookURL) == 0 {
 			if err == nil {
-				err = errors.New("No webhook url specified for repo " + prPayload.Title)
+				err = errors.New("No webhook url specified for repo " + prPayload.Repo)
 			}
 			logrus.Error(err)
 			return err
