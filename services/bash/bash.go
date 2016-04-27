@@ -24,7 +24,7 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 	case "reopened":
 		fallthrough
 	case "opened":
-		curConfig, err := config.Current()
+		currentConfig, err := config.Current()
 		if err != nil {
 			logrus.Error(err)
 			return err
@@ -34,7 +34,7 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 			logrus.Error(err)
 			return err
 		}
-		project, err := curConfig.GetProject(projectID)
+		project, err := currentConfig.GetProject(projectID)
 		if err != nil {
 			logrus.Error(err)
 			return err
@@ -45,7 +45,7 @@ var pullRequestHandler utils.ObserverFunc = func(payload interface{}) error {
 			repo := r
 			go func() {
 				runRepoScripts(repo, name)
-				trackerClient := tracker.New(os.Getenv(curConfig.TrackerAPIToken))
+				trackerClient := tracker.New(os.Getenv(currentConfig.TrackerAPIToken))
 				comment := fmt.Sprintf("This curConfigstory is ready to be tested on %s", repo.Host)
 				_, err = trackerClient.CommentOnStory(projectID, storyID, comment)
 				if err != nil {

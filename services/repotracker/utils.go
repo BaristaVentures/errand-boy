@@ -28,11 +28,11 @@ func GetTrackerData(pr *repos.PullRequest) (projectID, storyID int, err error) {
 }
 
 func getProjectIDForRepo(repo string) (int, bool) {
-	curConfig, err := config.Current()
+	currentConfig, err := config.Current()
 	if err != nil {
 		return 0, false
 	}
-	projects := curConfig.Projects
+	projects := currentConfig.Projects
 	for _, p := range projects {
 		if _, ok := p.Repos[repo]; ok {
 			return p.TrackerID, true

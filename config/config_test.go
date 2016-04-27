@@ -9,12 +9,12 @@ import (
 	"github.com/hooklift/assert"
 )
 
-func createConfigFile(conf *Config, configPath string) error {
+func createConfigFile(conf *Config, configFilePath string) error {
 	configBytes, err := json.Marshal(conf)
 	if err != nil {
 		return err
 	}
-	file, err := os.Create(configPath)
+	file, err := os.Create(configFilePath)
 	if err != nil {
 		return err
 	}
@@ -45,31 +45,31 @@ func TestLoadConfig(t *testing.T) {
 		},
 	}
 
-	configPath := "./test_eb-config.json"
-	err := createConfigFile(conf, configPath)
+	configFilePath := "./test_eb-config.json"
+	err := createConfigFile(conf, configFilePath)
 	assert.Ok(t, err)
-	defer os.Remove(configPath)
+	defer os.Remove(configFilePath)
 
-	loadedConf, err := Load(configPath)
+	loadedConf, err := Load(configFilePath)
 	assert.Ok(t, err)
 
 	assert.Equals(t, trackerAPIToken, loadedConf.TrackerAPIToken)
-	assert.Equals(t, 1, len(config.Projects))
-	project := config.Projects[0]
+	assert.Equals(t, 1, len(loadedConf.Projects))
+	project := loadedConf.Projects[0]
 	assert.Equals(t, trackerProjectID, project.TrackerID)
 	repo := project.Repos[repoName]
 	assert.Equals(t, repoToken, repo.Token)
 }
 
 func TestLoadMissingConfig(t *testing.T) {
-	configPath := "./missing_eb-config.json"
+	configFilePath := "./missing_eb-config.json"
 
-	_, err := Load(configPath)
+	_, err := Load(configFilePath)
 	assert.Cond(t, err != nil, "Error shouldn't be nil.")
 }
 
 func TestCurrentMissingConfig(t *testing.T) {
-	config = nil
+	conf = nil
 	_, err := Current()
 	assert.Cond(t, err != nil, "Error shouldn't be nil.")
 }
@@ -93,12 +93,12 @@ func TestGetProject(t *testing.T) {
 		},
 	}
 
-	configPath := "./test_eb-config.json"
-	err := createConfigFile(conf, configPath)
+	configFilePath := "./test_eb-config.json"
+	err := createConfigFile(conf, configFilePath)
 	assert.Ok(t, err)
-	defer os.Remove(configPath)
+	defer os.Remove(configFilePath)
 
-	loadedConf, err := Load(configPath)
+	loadedConf, err := Load(configFilePath)
 	assert.Ok(t, err)
 	project, err := loadedConf.GetProject(trackerProjectID)
 	assert.Ok(t, err)

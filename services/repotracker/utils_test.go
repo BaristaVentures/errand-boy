@@ -22,7 +22,7 @@ func TestGetTrackerData(t *testing.T) {
 	repoToken := "asdsad23edadsd1234812"
 	host := "localhost"
 	port := 8000
-	conf := &config.Config{
+	mockConfig := &config.Config{
 		TrackerAPIToken: trackerAPIToken,
 		Projects: []*config.Project{
 			&config.Project{
@@ -38,12 +38,12 @@ func TestGetTrackerData(t *testing.T) {
 		},
 	}
 
-	configPath := "./test_eb-config.json"
-	err := testutil.CreateConfigFile(conf, configPath)
-	defer os.Remove(configPath)
+	configFilePath := "./test_eb-config.json"
+	err := testutil.CreateConfigFile(mockConfig, configFilePath)
+	defer os.Remove(configFilePath)
 	assert.Ok(t, err)
 
-	_, err = config.Load(configPath)
+	_, err = config.Load(configFilePath)
 	assert.Ok(t, err)
 	storyID := 123456
 
@@ -71,9 +71,9 @@ func TestGetTrackerDataNoProjectConfig(t *testing.T) {
 		Repo:  "some-dudes-repo",
 		Title: "Awesome PR with a code in the title but with no matching config :'(' [1234]",
 	}
-	curConfig, _ := config.Current()
-	curConfig = &config.Config{}
-	curConfig.Projects = []*config.Project{}
+	currentConfig, _ := config.Current()
+	currentConfig = &config.Config{}
+	currentConfig.Projects = []*config.Project{}
 	_, _, err := GetTrackerData(pr)
 	assert.Cond(t, err != nil, "Err shouldn't be nil when there's no matching config for that repo.")
 }

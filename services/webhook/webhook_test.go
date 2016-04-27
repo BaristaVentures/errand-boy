@@ -31,7 +31,7 @@ func TestPRHandlerInvalidTitle(t *testing.T) {
 func TestPRHandlerEmptyHook(t *testing.T) {
 	trackerID := 987654321
 	repoName := "awesome-repo"
-	conf := &config.Config{}
+	mockConfig := &config.Config{}
 	reposMap := make(map[string]*config.Repo)
 	// Configure a repo with no Hook
 	reposMap[repoName] = &config.Repo{}
@@ -41,13 +41,13 @@ func TestPRHandlerEmptyHook(t *testing.T) {
 			Repos:     reposMap,
 		},
 	}
-	conf.Projects = projects
-	configPath := "./test_eb-config.json"
-	err := testutil.CreateConfigFile(conf, configPath)
-	defer os.Remove(configPath)
+	mockConfig.Projects = projects
+	configFilePath := "./test_eb-config.json"
+	err := testutil.CreateConfigFile(mockConfig, configFilePath)
+	defer os.Remove(configFilePath)
 	assert.Ok(t, err)
 
-	_, err = config.Load(configPath)
+	_, err = config.Load(configFilePath)
 	assert.Ok(t, err)
 
 	pr := repos.PullRequest{
@@ -64,7 +64,7 @@ func TestGetHookForRepo(t *testing.T) {
 	trackerID := 987654321
 	repoName := "awesome-repo"
 	hook := "http://webhook.com/build"
-	conf := &config.Config{}
+	mockConfig := &config.Config{}
 	reposMap := make(map[string]*config.Repo)
 	reposMap[repoName] = &config.Repo{
 		Hook: hook,
@@ -75,13 +75,13 @@ func TestGetHookForRepo(t *testing.T) {
 			Repos:     reposMap,
 		},
 	}
-	conf.Projects = projects
-	configPath := "./test_eb-config.json"
-	err := testutil.CreateConfigFile(conf, configPath)
-	defer os.Remove(configPath)
+	mockConfig.Projects = projects
+	configFilePath := "./test_eb-config.json"
+	err := testutil.CreateConfigFile(mockConfig, configFilePath)
+	defer os.Remove(configFilePath)
 	assert.Ok(t, err)
 
-	_, err = config.Load(configPath)
+	_, err = config.Load(configFilePath)
 	assert.Ok(t, err)
 
 	foundHook, err := getHookForRepo(trackerID, repoName)
@@ -92,7 +92,7 @@ func TestGetHookForRepo(t *testing.T) {
 func TestGetHookForRepoNoHook(t *testing.T) {
 	trackerID := 987654321
 	repoName := "awesome-repo"
-	conf := &config.Config{}
+	mockConfig := &config.Config{}
 	reposMap := make(map[string]*config.Repo)
 	// Init a repo without a hook.
 	reposMap[repoName] = &config.Repo{}
@@ -102,13 +102,13 @@ func TestGetHookForRepoNoHook(t *testing.T) {
 			Repos:     reposMap,
 		},
 	}
-	conf.Projects = projects
-	configPath := "./test_eb-config.json"
-	err := testutil.CreateConfigFile(conf, configPath)
-	defer os.Remove(configPath)
+	mockConfig.Projects = projects
+	configFilePath := "./test_eb-config.json"
+	err := testutil.CreateConfigFile(mockConfig, configFilePath)
+	defer os.Remove(configFilePath)
 	assert.Ok(t, err)
 
-	_, err = config.Load(configPath)
+	_, err = config.Load(configFilePath)
 	assert.Ok(t, err)
 
 	foundHook, err := getHookForRepo(trackerID, repoName)
@@ -119,7 +119,7 @@ func TestGetHookForRepoNoHook(t *testing.T) {
 func TestGetHookForRepoNoProject(t *testing.T) {
 	trackerID := 987654321
 	repoName := "awesome-repo"
-	conf := &config.Config{}
+	mockConfig := &config.Config{}
 	reposMap := make(map[string]*config.Repo)
 	// Init a repo without a hook.
 	reposMap[repoName] = &config.Repo{}
@@ -129,13 +129,13 @@ func TestGetHookForRepoNoProject(t *testing.T) {
 			Repos:     reposMap,
 		},
 	}
-	conf.Projects = projects
-	configPath := "./test_eb-config.json"
-	err := testutil.CreateConfigFile(conf, configPath)
-	defer os.Remove(configPath)
+	mockConfig.Projects = projects
+	configFilePath := "./test_eb-config.json"
+	err := testutil.CreateConfigFile(mockConfig, configFilePath)
+	defer os.Remove(configFilePath)
 	assert.Ok(t, err)
 
-	_, err = config.Load(configPath)
+	_, err = config.Load(configFilePath)
 	assert.Ok(t, err)
 	// Call with a tracker ID that doesn't belong to any configured project.
 	foundHook, err := getHookForRepo(00000000, repoName)
